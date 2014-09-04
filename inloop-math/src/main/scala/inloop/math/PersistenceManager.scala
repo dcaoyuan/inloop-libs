@@ -60,7 +60,7 @@ trait PersistenceManager {
   def properties: Properties
 
   def saveContent(content: Content)
-  def restoreContent(uniSymbol: String): Content
+  def restoreContent(identifier: String): Content
   def defaultContent: Content
 
   def lookupAllRegisteredServices[T](tpe: Class[T], folderName: String): Seq[T]

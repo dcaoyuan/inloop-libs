@@ -13,6 +13,7 @@
   <classpathentry kind="lib" path="/home/dcaoyuan/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.10.4.jar" scope="test"/>
   <classpathentry kind="agg" path="inloop-util" base="/home/dcaoyuan/myprjs/inloop-libs/inloop-util"/>
   <classpathentry kind="agg" path="inloop-math" base="/home/dcaoyuan/myprjs/inloop-libs/inloop-math"/>
+  <classpathentry kind="agg" path="inloop-indicator" base="/home/dcaoyuan/myprjs/inloop-libs/inloop-indicator"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="output" path="bin"/>
 </classpath>

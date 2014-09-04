@@ -8,7 +8,7 @@ import com.typesafe.sbt.osgi.OsgiKeys._
 object Build extends sbt.Build {
 
   lazy val root = Project("inloop-libs-root", file("."))
-    .aggregate(inloop_util, inloop_math)
+    .aggregate(inloop_util, inloop_math, inloop_indicator)
     .settings(basicSettings: _*)
     .settings(noPublishing: _*)
 
@@ -26,6 +26,16 @@ object Build extends sbt.Build {
     .settings(formatSettings: _*)
     .settings(releaseSettings: _*)
     .settings(libraryDependencies ++= Dependencies.all)
+
+  lazy val inloop_indicator = Project("inloop-indicator", file("inloop-indicator"))
+    .dependsOn(inloop_util, inloop_math)
+    .settings(defaultOsgiSettings: _*)
+    .settings(basicSettings: _*)
+    .settings(formatSettings: _*)
+    .settings(releaseSettings: _*)
+    .settings(libraryDependencies ++= Dependencies.all)
+
+
 
   lazy val basicSettings = Seq(
     organization := "io.inloop",

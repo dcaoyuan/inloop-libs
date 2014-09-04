@@ -1,17 +1,16 @@
 package inloop.math.timeseries.descriptor
 
-import java.util.logging.Level
-import java.util.logging.Logger
-import javax.swing.Action
 import inloop.math.PersistenceManager
 import inloop.math.timeseries.TFreq
+import java.util.logging.Level
+import java.util.logging.Logger
 import scala.collection.mutable.ArrayBuffer
 
 /**
  *
  * @author Caoyuan Deng
  */
-class Content(var uniSymbol: String) extends Cloneable {
+class Content(var identifier: String) extends Cloneable {
   private val log = Logger.getLogger(this.getClass.getName)
 
   /** use List to store descriptor, so they can be ordered by index */

@@ -1,7 +1,6 @@
-package inloop.math.timeseries.datasource
+package inloop.math.timeseries
 
-import inloop.math.timeseries.TFreq
-import inloop.math.timeseries.BaseTSer
+import inloop.math.timeseries.datasource.DataContract
 import inloop.math.timeseries.descriptor.Content
 import inloop.util.actors.Publisher
 
@@ -9,9 +8,19 @@ import inloop.util.actors.Publisher
  *
  * @author Caoyuan Deng
  */
-trait SerProvider extends Publisher {
+trait Thing extends Publisher {
   type T <: BaseTSer
   type C <: DataContract[_]
+
+  def identifier: String
+  def identifier_=(identifier: String)
+
+  def name: String
+
+  def description: String
+  def description_=(description: String)
+
+  def serOf(freq: TFreq): Option[T]
 
   /**
    * Load sers, can be called to load ser whenever
@@ -22,17 +31,7 @@ trait SerProvider extends Publisher {
   def putSer(ser: T)
   def resetSers
 
-  def uniSymbol: String
-  def uniSymbol_=(symbol: String)
-
-  def name: String
-
   def stopAllDataServer
-
-  def serOf(freq: TFreq): Option[T]
-
-  def description: String
-  def description_=(description: String)
 
   /**
    * The content of each symbol should be got automatailly from PersistenceManager.restoreContent
@@ -41,8 +40,8 @@ trait SerProvider extends Publisher {
   def content: Content
 
   /**
-   * A helper method which can be overridden to get another ser provider from symbol
+   * A helper method which can be overridden to get another ser provider from identifier
    */
-  def serProviderOf(uniSymbol: String): Option[SerProvider]
+  def thingOf(identifier: String): Option[Thing]
 }
 

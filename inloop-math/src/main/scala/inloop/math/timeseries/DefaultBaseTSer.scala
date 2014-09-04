@@ -5,9 +5,8 @@ package inloop.math.timeseries
  * @author Caoyuan Deng
  */
 import java.util.logging.Logger
-import inloop.math.timeseries.datasource.SerProvider
 
-class DefaultBaseTSer(_serProvider: SerProvider, _freq: TFreq) extends DefaultTSer(_freq) with BaseTSer {
+class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) with BaseTSer {
   def this() = this(null, TFreq.DAILY)
 
   private val log = Logger.getLogger(getClass.getName)
@@ -16,7 +15,7 @@ class DefaultBaseTSer(_serProvider: SerProvider, _freq: TFreq) extends DefaultTS
 
   attach(TStamps(INIT_CAPACITY))
 
-  def serProvider = _serProvider
+  def thing = _thing
 
   /*-
    * !NOTICE

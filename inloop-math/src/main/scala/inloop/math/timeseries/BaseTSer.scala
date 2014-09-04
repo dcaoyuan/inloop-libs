@@ -4,11 +4,10 @@ package inloop.math.timeseries
  *
  * @author Caoyuan Deng
  */
-import inloop.math.timeseries.datasource.SerProvider
 
 trait BaseTSer extends TSer {
 
-  def serProvider: SerProvider
+  def thing: Thing
 
   // --- Only BaseTSer can have methods that explictly add value
   def createOrReset(time: Long)

@@ -18,16 +18,16 @@ class IndicatorDescriptor($serviceClassName: => String, $freq: => TFreq, $factor
 
   private var _factors = new ArrayList[Factor] ++= $factors
 
-  private var _uniSymbol: Option[String] = None
+  private var _identifier: Option[String] = None
 
   /**
    * You specify the indictor is from another symbols
    */
-  def uniSymbol = _uniSymbol
-  def uniSymbol_=(uniSymbol: String) {
-    _uniSymbol = uniSymbol match {
+  def identifier = _identifier
+  def identifier_=(identifier: String) {
+    _identifier = identifier match {
       case null | "" => None
-      case _         => Some(uniSymbol)
+      case _         => Some(identifier)
     }
   }
 
@@ -83,11 +83,11 @@ class IndicatorDescriptor($serviceClassName: => String, $freq: => TFreq, $factor
       case Some(indx) =>
         // is this indicator from another symbol ?
         val baseSer = (
-          for (
-            s <- uniSymbol if s != baseSerx.serProvider.uniSymbol;
-            p <- baseSerx.serProvider.serProviderOf(s);
+          for {
+            s <- identifier if s != baseSerx.thing.identifier
+            p <- baseSerx.thing.thingOf(s)
             b <- p.serOf(baseSerx.freq)
-          ) yield b) getOrElse baseSerx
+          } yield b) getOrElse baseSerx
 
         val instance = if (factors.length == 0) {
           // this means this indicatorDescritor's factors may not be set yet, so set a default one now
