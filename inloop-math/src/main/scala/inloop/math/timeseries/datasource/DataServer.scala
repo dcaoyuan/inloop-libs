@@ -25,10 +25,12 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
   type C <: DataContract[_]
 
   private case class RequestData(contracts: Iterable[C])
-  // @Note due to bug in PartialFunction, the inner final case class will cause isDefinedAt won't be compiled
-  final case class DataLoaded(values: Array[V], contract: C)
-  final case class DataProcessed(contract: C)
-  final case class Heartbeat(interval: Int)
+  /** @Note due to bug in PartialFunction, the inner final case class will cause isDefinedAt won't be compiled
+   * https://issues.scala-lang.org/browse/SI-7151 -- only fixed for 2.11.x
+   */
+  /* final*/ case class DataLoaded(values: Array[V], contract: C)
+  /* final*/ case class DataProcessed(contract: C)
+  /* final*/ case class Heartbeat(interval: Int)
 
   protected val EmptyValues = Array[V]()
   protected val LONG_LONG_AGO: Long = Long.MinValue
