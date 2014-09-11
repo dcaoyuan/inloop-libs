@@ -68,6 +68,8 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
 
   def this() = this(TFreq.DAILY)
 
+  def receive = listenerManagement
+
   def freq = _freq
   def set(freq: TFreq) {
     _freq = freq
@@ -246,7 +248,7 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
       //timestamps.readLock.unlock
     }
 
-    publish(TSerEvent.Cleared(this, shortName, fromTime, Long.MaxValue))
+    publish(TSerEvent.Cleared(self, shortName, fromTime, Long.MaxValue))
   }
 
   def indexOfOccurredTime(time: Long): Int = {

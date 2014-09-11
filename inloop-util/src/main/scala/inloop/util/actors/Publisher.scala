@@ -1,6 +1,10 @@
 package inloop.util.actors
 
+import akka.actor.Actor
+import akka.actor.ActorRef
 import scala.collection.mutable
+import scala.ref.Reference
+import scala.ref.WeakReference
 
 /**
  * <p>
@@ -17,49 +21,42 @@ import scala.collection.mutable
  *    since reactors (strongly) reference publishers they are interested in.
  *  </p>
  */
-trait Publisher extends Reactor {
+sealed trait ListenerMessage
+case class Listen(listener: ActorRef) extends ListenerMessage
+case class Deafen(listener: ActorRef) extends ListenerMessage
+case class WithListeners(f: (ActorRef) => Unit) extends ListenerMessage
+trait StronglyReferenced
 
-  final val listeners = new RefSet[Reactor] {
-    import Reactions._
-    import scala.ref._
-    val underlying = new mutable.HashSet[Reference[Reactor]]
-    protected def Ref(a: Reactor) = a match {
-      case a: StronglyReferenced => new StrongReference[Reactor](a) with super.Ref[Reactor]
-      case _                     => new WeakReference[Reactor](a, referenceQueue) with super.Ref[Reactor]
+trait Publisher { _: Actor =>
+
+  final lazy val listeners = new RefSet[ActorRef] {
+    lazy val underlying = new mutable.HashSet[Reference[ActorRef]]
+    protected def Ref(a: ActorRef) = a match {
+      case a: StronglyReferenced => new StrongReference[ActorRef](a) with super.Ref[ActorRef]
+      case _                     => new WeakReference[ActorRef](a, referenceQueue) with super.Ref[ActorRef]
     }
   }
 
-  private[actors] def subscribe(listener: Reactor) { listeners += listener }
-  private[actors] def unsubscribe(listener: Reactor) { listeners -= listener }
+  /**
+   * Chain this into the receive function.
+   *
+   * {{{ def receive = listenerManagement orElse … }}}
+   */
+  protected def listenerManagement: Actor.Receive = {
+    case Listen(l) => listeners += l
+    case Deafen(l) => listeners -= l
+    case WithListeners(f) =>
+      f(self)
+      val i = listeners.iterator
+      while (i.hasNext) f(i.next)
+  }
 
   /**
    * Notify all registered reactions.
    */
-  def publish(e: Any) {
-    for (l <- listeners) l.underlyingActor ! e
-  }
-
-  listenTo(this)
-}
-
-/**
- * A publisher that subscribes itself to an underlying event source not before the first
- * reaction is installed. Can unsubscribe itself when the last reaction is uninstalled.
- */
-private[actors] trait LazyPublisher extends Publisher {
-  import Reactions._
-
-  protected def onFirstSubscribe()
-  protected def onLastUnsubscribe()
-
-  override def subscribe(listener: Reactor) {
-    if (listeners.size == 1) onFirstSubscribe()
-    super.subscribe(listener)
-  }
-
-  override def unsubscribe(listener: Reactor) {
-    super.unsubscribe(listener)
-    if (listeners.size == 1) onLastUnsubscribe()
+  def publish(msg: Any) {
+    self ! msg
+    val i = listeners.iterator
+    while (i.hasNext) i.next ! msg
   }
 }
-

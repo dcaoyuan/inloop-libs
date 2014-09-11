@@ -1,5 +1,6 @@
 package inloop.math.timeseries
 
+import akka.actor.Actor
 import inloop.math.timeseries.datasource.DataContract
 import inloop.math.timeseries.descriptor.Content
 import inloop.util.actors.Publisher
@@ -8,7 +9,7 @@ import inloop.util.actors.Publisher
  *
  * @author Caoyuan Deng
  */
-trait Thing extends Publisher {
+trait Thing extends Actor with Publisher {
   type T <: BaseTSer
   type C <: DataContract[_]
 

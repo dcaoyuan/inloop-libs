@@ -1,5 +1,6 @@
 package inloop.math.signal
 
+import akka.actor.Actor
 import inloop.math.indicator.SignalIndicator
 import inloop.util.actors.Publisher
 import java.awt.Color
@@ -95,7 +96,9 @@ class Signal(val time: Long, _kind: Kind, val id: Int = 0, val text: String = nu
   }
 }
 
-object Signal extends Publisher {
+object Signal extends Actor with Publisher {
+
+  def receive = listenerManagement
 
   // --- simple test
   def main(args: Array[String]) {

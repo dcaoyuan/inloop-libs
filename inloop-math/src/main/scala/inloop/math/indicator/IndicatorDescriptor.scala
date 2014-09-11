@@ -10,7 +10,7 @@ import inloop.math.timeseries.descriptor.Descriptor
  *
  * @author Caoyuan Deng
  */
-class IndicatorDescriptor($serviceClassName: => String, $freq: => TFreq, $factors: => Array[Factor], $active: => Boolean) extends Descriptor[Indicator]($serviceClassName, $freq, $active) {
+class IndicatorDescriptor(_serviceClassName: => String, _freq: => TFreq, $factors: => Array[Factor], _active: => Boolean) extends Descriptor[Indicator](_serviceClassName, _freq, _active) {
 
   def this() = this(null, TFreq.DAILY, Array[Factor](), false)
 
@@ -79,40 +79,43 @@ class IndicatorDescriptor($serviceClassName: => String, $freq: => TFreq, $factor
    * @param baseSer for indicator
    */
   override protected def createServiceInstance(args: Any*): Option[Indicator] = args match {
-    case Seq(baseSerx: BaseTSer) => lookupServiceTemplate(classOf[Indicator], "Indicators") match {
-      case Some(indx) =>
-        // is this indicator from another symbol ?
-        val baseSer = (
-          for {
-            s <- identifier if s != baseSerx.thing.identifier
-            p <- baseSerx.thing.thingOf(s)
-            b <- p.serOf(baseSerx.freq)
-          } yield b) getOrElse baseSerx
+    case Seq(baseSerx: BaseTSer) =>
+      lookupServiceTemplate(classOf[Indicator], "Indicators") match {
+        case Some(indx) =>
+          // is this indicator from another symbol ?
+          val baseSer = (
+            for {
+              id <- identifier if id != baseSerx.thing.identifier
+              thing <- baseSerx.thing.thingOf(id)
+              base <- thing.serOf(baseSerx.freq)
+            } yield base) getOrElse baseSerx
 
-        val instance = if (factors.length == 0) {
-          // this means this indicatorDescritor's factors may not be set yet, so set a default one now
-          val instancex = Indicator(indx.getClass.asInstanceOf[Class[Indicator]], baseSer)
-          factors = instancex.factors
-          instancex
-        } else {
-          // should set facs here, because it's from one that is stored in xml
-          Indicator(indx.getClass.asInstanceOf[Class[Indicator]], baseSer, factors: _*)
-        }
+          val instance = if (factors.length == 0) {
+            // this means this indicatorDescritor's factors may not be set yet, so set a default one now
+            val instancex = Indicator(indx.getClass.asInstanceOf[Class[Indicator]], baseSer)
+            factors = instancex.factors
+            instancex
+          } else {
+            // should set facs here, because it's from one that is stored in xml
+            Indicator(indx.getClass.asInstanceOf[Class[Indicator]], baseSer, factors: _*)
+          }
 
-        Option(instance)
-      case None => None
-    }
+          Option(instance)
+        case None => None
+      }
     case _ => None
   }
 
   def setFacsToDefault {
     val defaultFacs = PersistenceManager().defaultContent.lookupDescriptor(
       classOf[IndicatorDescriptor], serviceClassName, freq) match {
-        case None => lookupServiceTemplate(classOf[Indicator], "Indicators") match {
-          case None    => None
-          case Some(x) => Some(x.factors)
-        }
-        case Some(defaultDescriptor) => Some(defaultDescriptor.factors)
+        case None =>
+          lookupServiceTemplate(classOf[Indicator], "Indicators") match {
+            case None    => None
+            case Some(x) => Some(x.factors)
+          }
+        case Some(defaultDescriptor) =>
+          Some(defaultDescriptor.factors)
       }
 
     defaultFacs foreach { x => factors = x }

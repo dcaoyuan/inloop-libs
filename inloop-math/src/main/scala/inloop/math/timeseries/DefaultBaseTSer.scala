@@ -212,7 +212,7 @@ class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
           i += 1
       }
 
-      publish(TSerEvent.Updated(this, shortName, frTime, toTime))
+      publish(TSerEvent.Updated(self, shortName, frTime, toTime))
 
     } finally {
       writeLock.unlock

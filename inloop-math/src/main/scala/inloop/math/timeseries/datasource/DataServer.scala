@@ -1,20 +1,17 @@
 package inloop.math.timeseries.datasource
 
-import java.awt.Image
-import java.awt.Toolkit
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import java.util.Timer
-import java.util.TimerTask
 import java.util.logging.Level
 import java.util.logging.Logger
-import com.typesafe.config.ConfigFactory
+import akka.actor.Actor
+import akka.actor.Props
 import inloop.math.timeseries.TVal
 import inloop.util.actors.Publisher
-import inloop.util.actors.Reactor
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import scala.concurrent.duration._
 
 /**
  * This class will load the quote datas from data source to its data storage: quotes.
@@ -22,16 +19,16 @@ import scala.reflect.ClassTag
  * @param [V] data storege type
  * @author Caoyuan Deng
  */
-abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publisher {
-  import DataServer._
+abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor with Publisher {
   private val log = Logger.getLogger(this.getClass.getName)
 
   type C <: DataContract[_]
 
   private case class RequestData(contracts: Iterable[C])
   // @Note due to bug in PartialFunction, the inner final case class will cause isDefinedAt won't be compiled
-  case class DataLoaded(values: Array[V], contract: C)
-  case class DataProcessed(contract: C)
+  final case class DataLoaded(values: Array[V], contract: C)
+  final case class DataProcessed(contract: C)
+  final case class Heartbeat(interval: Int)
 
   protected val EmptyValues = Array[V]()
   protected val LONG_LONG_AGO: Long = Long.MinValue
@@ -66,12 +63,12 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publi
   // --- a proxy actor for HeartBeat event etc, which will detect the speed of
   // refreshing requests, if consumer can not catch up the producer, will drop
   // some requests.
-  reactions += {
-    case HeartBeat(interval) =>
+  def receive = listenerManagement orElse {
+    case Heartbeat(interval) =>
       if (isRefreshable && flowCount < 5) {
         // refresh from loadedTime for subscribedContracts
         try {
-          log.fine("Got HeartBeat message, going to request data, flowCount=" + flowCount)
+          log.fine("Got Heartbeat message, going to request data, flowCount=" + flowCount)
           requestActor ! RequestData(subscribedContracts)
         } catch {
           case ex: Throwable => log.log(Level.WARNING, ex.getMessage, ex)
@@ -81,15 +78,15 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publi
       }
       flowCount = math.max(0, flowCount) // avoid too big gap
   }
-  listenTo(DataServer)
 
-  /**
-   * We'll separate requestActor and processActor, so the request and process routines can be balanced a bit.
-   * Otherwise, if the RequestData messages were sent batched, there will be no change to fetch DataLoaded message
-   * before RequestData
-   */
-  private val requestActor = new Reactor {
-    reactions += {
+  {
+    import context.dispatcher
+    val heartbeatInterval = context.system.settings.config.getInt("inloop.dataserver.heartbeat")
+    context.system.scheduler.schedule(1.seconds, heartbeatInterval.seconds, self, Heartbeat(heartbeatInterval))
+  }
+
+  final class RequestActor extends Actor {
+    def receive = {
       case RequestData(contracts) =>
         try {
           flowCount += 1
@@ -101,8 +98,8 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publi
     }
   }
 
-  private val processActor = new Reactor {
-    reactions += {
+  final class ProcessActor extends Actor {
+    def receive = {
       // @Note 'contract' may be null, for instance: batch tickers loaded with multiple symbols.
       case DataLoaded(values, contract) =>
         val t0 = System.currentTimeMillis
@@ -122,6 +119,14 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publi
         log.info("Processed data in " + (System.currentTimeMillis - t0) + "ms")
     }
   }
+
+  /**
+   * We'll separate requestActor and processActor, so the request and process routines can be balanced a bit.
+   * Otherwise, if the RequestData messages were sent batched, there will be no chance to fetch DataLoaded message
+   * before RequestData
+   */
+  private val requestActor = context.actorOf(Props(classOf[RequestActor]))
+  private val processActor = context.actorOf(Props(classOf[ProcessActor]))
 
   // --- public interfaces
 
@@ -205,12 +210,6 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publi
   def serialNumber: Int
 
   /**
-   * Override it to return your icon
-   * @return an image as the data server icon
-   */
-  def icon: Option[Image] = DEFAULT_ICON
-
-  /**
    * Convert source sn to source id in format of :
    * sn (0-63)       id (64 bits)
    * 0               ..,0000,0000
@@ -268,25 +267,5 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Publi
   }
 
   override def toString: String = displayName
-}
-
-object DataServer extends Publisher {
-  private lazy val DEFAULT_ICON: Option[Image] = {
-    Option(classOf[DataServer[_]].getResource("defaultIcon.gif")) map { url => Toolkit.getDefaultToolkit.createImage(url) }
-  }
-
-  private val config = ConfigFactory.load()
-  private val heartbeatInterval = config.getInt("inloop.dataserver.heartbeat")
-  final case class HeartBeat(interval: Long)
-
-  // in context of applet, a page refresh may cause timer into a unpredict status,
-  // so it's always better to restart this timer? , if so, cancel it first.
-  //    if (timer != null) {
-  //      timer.cancel
-  //    }
-  private val timer = new Timer("DataServer Heart Beat Timer")
-  timer.schedule(new TimerTask {
-    def run = publish(HeartBeat(heartbeatInterval))
-  }, 1000, heartbeatInterval)
 }
 

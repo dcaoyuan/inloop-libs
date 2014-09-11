@@ -40,7 +40,8 @@ final class Id[T](val klass: Class[T], val keyRef: AnyRef, val args: Any*) {
         case x: Long    => (x ^ (x >>> 32)).toInt
         case x: Float   => java.lang.Float.floatToIntBits(x)
         case x: Double =>
-          val x1 = java.lang.Double.doubleToLongBits(x); (x1 ^ (x1 >>> 32)).toInt
+          val x1 = java.lang.Double.doubleToLongBits(x)
+          (x1 ^ (x1 >>> 32)).toInt
         case x: AnyRef => x.hashCode
       }
       h = 37 * h + more

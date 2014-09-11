@@ -15,7 +15,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
 
   protected val Plot = inloop.math.indicator.Plot
 
-  reactions += {
+  def receive = listenerManagement orElse {
     case ComputeFrom(time) =>
       if (baseSer != null) computeFrom(time)
     case FactorChanged =>
@@ -50,7 +50,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
 
 }
 
-trait WithFactors { self: Indicator =>
+trait WithFactors { _: Indicator =>
 
   /**
    * factors of this instance, such as period long, period short etc,

@@ -1,8 +1,8 @@
 package inloop.math.indicator
 
 import inloop.math.timeseries.TSerEvent
+import akka.actor.Actor
 import inloop.math.timeseries.BaseTSer
-import inloop.util.actors.Reactions
 
 /**
  * A helper class to implement most of the Indicator methods, it can be used
@@ -13,7 +13,7 @@ import inloop.util.actors.Reactions
  *
  * @author Caoyuan Deng
  */
-trait IndicatorHelper { self: Indicator =>
+trait IndicatorHelper { me: Indicator =>
 
   /**
    * preComputeFrom will set and backup the context before computeFrom(long begTime):
@@ -24,7 +24,7 @@ trait IndicatorHelper { self: Indicator =>
    */
   private var fromTime: Long = _ // used by postComputeFrom only
 
-  private var baseSerReaction: Reactions.Reaction = _
+  private var baseSerReaction: Actor.Receive = _
   // remember event's callback to be forwarded in postCompute()
   private var baseSerEventCallBack: TSerEvent.Callback = _
 
@@ -38,13 +38,13 @@ trait IndicatorHelper { self: Indicator =>
      */
     baseSerReaction = {
       case TSerEvent.Loaded(_, _, fromTime, toTime, _, callback) =>
-        self.computeFrom(fromTime)
+        me.computeFrom(fromTime)
         baseSerEventCallBack = callback
       case TSerEvent.Refresh(_, _, fromTime, toTime, _, callback) =>
-        self.computeFrom(fromTime)
+        me.computeFrom(fromTime)
         baseSerEventCallBack = callback
       case TSerEvent.Updated(_, _, fromTime, toTime, _, callback) =>
-        self.computeFrom(fromTime)
+        me.computeFrom(fromTime)
         baseSerEventCallBack = callback
       case TSerEvent.Computed(src, _, fromTime, toTime, _, callback) if (src eq baseSer) && (src ne this) =>
         /**
@@ -53,10 +53,10 @@ trait IndicatorHelper { self: Indicator =>
          * then run to here, this may cause a dead loop. So, FinishedComputing
          * should not react when self eq baseSer
          */
-        self.computeFrom(fromTime)
+        me.computeFrom(fromTime)
         baseSerEventCallBack = callback
       case TSerEvent.Cleared(src, _, fromTime, toTime, _, callback) if (src eq baseSer) && (src ne this) =>
-        self.clear(fromTime)
+        me.clear(fromTime)
         baseSerEventCallBack = callback
     }
 
@@ -66,27 +66,27 @@ trait IndicatorHelper { self: Indicator =>
   def preComputeFrom(fromTime: Long): Int = {
     assert(this.baseSer != null, "base series not set!")
 
-    val timestamps = self.timestamps
+    val timestamps = me.timestamps
 
     val (fromTime1, fromIdx, mayNeedToValidate) = if (fromTime <= 0) {
       (fromTime, 0, true)
     } else {
-      if (fromTime < self.computedTime) {
+      if (fromTime < me.computedTime) {
         // * the timestamps <-> items map may not be validate now, should validate it first
         val fromTimeX = fromTime
         // * indexOfOccurredTime always returns physical index, so don't worry about isOncalendarTime
         val fromIdxX = math.max(timestamps.indexOfOccurredTime(fromTimeX), 0) // should not less then 0
         (fromTimeX, fromIdxX, true)
-      } else if (fromTime > self.computedTime) {
+      } else if (fromTime > me.computedTime) {
         // * if begTime > computedTime, re-compute from computedTime
-        val fromTimeX = self.computedTime
+        val fromTimeX = me.computedTime
         // * indexOfOccurredTime always returns physical index, so don't worry about isOncalendarTime
         val fromIdxX = math.max(timestamps.indexOfOccurredTime(fromTimeX), 0) // should not less then 0
-        (fromTimeX, fromIdxX, timestamps.size > self.size)
+        (fromTimeX, fromIdxX, timestamps.size > me.size)
       } else {
         // * begTime == computedTime
         // * if begTime > computedTime, re-compute from computedTime
-        val fromTimeX = self.computedTime
+        val fromTimeX = me.computedTime
         // * indexOfOccurredTime always returns physical index, so don't worry about isOncalendarTime
         val fromIdxX = math.max(timestamps.indexOfOccurredTime(fromTimeX), 0) // should not less then 0
         (fromTimeX, fromIdxX, false)
@@ -94,11 +94,11 @@ trait IndicatorHelper { self: Indicator =>
     }
 
     if (this ne baseSer) {
-      self.validate
+      me.validate
     }
 
     //        if (mayNeedToValidate) {
-    //            self.validate
+    //            me.validate
     //        }
 
     this.fromTime = fromTime1
@@ -119,18 +119,16 @@ trait IndicatorHelper { self: Indicator =>
 
   def postComputeFrom {
     // construct resultSer's change event, forward baseTSerEventCallBack
-    self.publish(TSerEvent.Computed(self,
+    me.publish(TSerEvent.Computed(
+      self,
       null,
       fromTime,
-      self.computedTime,
+      me.computedTime,
       null,
       baseSerEventCallBack))
   }
 
   def dispose {
-    if (baseSerReaction != null) {
-      baseSer.reactions -= baseSerReaction
-    }
   }
 
 }
