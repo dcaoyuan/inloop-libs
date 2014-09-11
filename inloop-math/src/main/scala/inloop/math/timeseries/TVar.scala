@@ -5,7 +5,7 @@ import inloop.collection.ArrayList
 import scala.reflect.ClassTag
 
 /**
- * A horizontal view of Ser. Is' a reference of one of the field vars.
+ * A horizontal view of Ser. It's a reference of one of the field vars.
  * V is the type of value
  *
  * @author Caoyuan Deng
@@ -17,6 +17,11 @@ abstract class TVar[V: ClassTag] extends Plottable {
   def name_=(name: String)
 
   def timestamps: TStamps
+
+  /**
+   * @return Is it an instant variable if true, or an accumulate variable if false.
+   */
+  def isInstant: Boolean
 
   /**
    * Append or insert value at time

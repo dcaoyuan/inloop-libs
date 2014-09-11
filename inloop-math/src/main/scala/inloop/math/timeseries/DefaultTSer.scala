@@ -389,12 +389,13 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
   override def hashCode: Int = _hashCode
 
   object TVar {
-    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, plot)
+    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", true, Plot.None)
+    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, true, Plot.None)
+    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, true, plot)
+    def apply[V: ClassTag](name: String, isInstant: Boolean, plot: Plot): TVar[V] = new InnerTVar[V](name, isInstant, plot)
   }
 
-  final protected class InnerTVar[V: ClassTag](_name: String, _plot: Plot) extends AbstractInnerTVar[V](_name, _plot) {
+  final protected class InnerTVar[V: ClassTag](_name: String, _isInstant: Boolean, _plot: Plot) extends AbstractInnerTVar[V](_name, _isInstant, _plot) {
 
     private var _values = new ArrayList[V](INIT_CAPACITY)
     def values = _values
@@ -524,7 +525,7 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
    * operation on values, including add, delete actions will be consistant by
    * cooperating with DefaultSer.
    */
-  abstract class AbstractInnerTVar[V: ClassTag](var name: String, var plot: Plot) extends TVar[V] {
+  abstract class AbstractInnerTVar[V: ClassTag](var name: String, var isInstant: Boolean, var plot: Plot) extends TVar[V] {
 
     addVar(this)
 
