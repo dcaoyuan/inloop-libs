@@ -5,7 +5,7 @@ package inloop.math.indicator
  *
  * @author Caoyuan Deng
  */
-abstract class Plot
+trait Plot
 object Plot {
   case object None extends Plot
   case object Line extends Plot
@@ -13,7 +13,7 @@ object Plot {
   case object Dot extends Plot
   case object Shade extends Plot
   case object Profile extends Plot
-  case object Quote extends Plot
+  case object OHLC extends Plot
   case object Volume extends Plot
   case object Signal extends Plot
   case object Zigzag extends Plot

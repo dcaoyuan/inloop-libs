@@ -26,8 +26,6 @@ import scala.reflect.ClassTag
  * @author Caoyuan Deng
  */
 class DefaultTSer(private var _freq: TFreq) extends TSer {
-  private val log = Logger.getLogger(getClass.getName)
-
   protected val INIT_CAPACITY = 100
 
   /**
@@ -40,12 +38,12 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
    * a place holder plus flags
    */
   final protected type Holder = Boolean
-  final protected val holders = new ArrayList[Holder] //(INIT_CAPACITY)// this will cause timestamps' lock deadlock?
+  final protected val holders = new ArrayList[Holder]() //(INIT_CAPACITY)// this will cause timestamps' lock deadlock?
   /**
    * Each var element of array is a Var that contains a sequence of values for one field of SerItem.
    * @Note: Don't use scala's HashSet or HashMap to store Var, these classes seems won't get all of them stored
    */
-  val vars = new ArrayList[TVar[_]]
+  val vars = new ArrayList[TVar[_]]()
 
   /**
    * we implement occurred timestamps and items in density mode instead of spare
@@ -122,11 +120,6 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
     // todo
   }
 
-  /**
-   * return a holder with value is true
-   */
-  protected def createItem(time: Long): Holder = true
-
   def longName: String = lname
   def shortName: String = sname
   def shortName_=(sname: String) {
@@ -179,11 +172,11 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
               while (i < insertSize) {
                 val time = timestamps(begIdx1 + i)
                 vars foreach (_.putNull(time))
-                newHolders(i) = createItem(time)
+                newHolders(i) = true
                 i += 1
               }
               holders.insertAll(begIdx1, newHolders)
-              log.fine(shortName + "(" + freq + ") Log check: cursor=" + checkingCursor + ", insertSize=" + insertSize + ", begIdx=" + begIdx1 + " => newSize=" + holders.size)
+              log.debug(shortName + "(" + freq + ") Log check: cursor=" + checkingCursor + ", insertSize=" + insertSize + ", begIdx=" + begIdx1 + " => newSize=" + holders.size)
 
             case TStampsLog.APPEND =>
               val begIdx = holders.size
@@ -197,11 +190,11 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
               while (i < appendSize) {
                 val time = timestamps(begIdx + i)
                 vars foreach (_.putNull(time))
-                newHolders(i) = createItem(time)
+                newHolders(i) = true
                 i += 1
               }
               holders ++= newHolders
-              log.fine(shortName + "(" + freq + ") Log check: cursor=" + checkingCursor + ", appendSize=" + appendSize + ", begIdx=" + begIdx + " => newSize=" + holders.size)
+              log.debug(shortName + "(" + freq + ") Log check: cursor=" + checkingCursor + ", appendSize=" + appendSize + ", begIdx=" + begIdx + " => newSize=" + holders.size)
 
             case x => assert(false, "Unknown log type: " + x)
           }
@@ -217,7 +210,7 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
           ", checkedCursor=" + tsLogCheckedCursor +
           ", log=" + tlog)
     } catch {
-      case ex: Throwable => log.log(Level.WARNING, "exception", ex)
+      case ex: Throwable => log.warning(ex.getMessage)
     } finally {
       writeLock.unlock
       //timestamps.readLock.unlock

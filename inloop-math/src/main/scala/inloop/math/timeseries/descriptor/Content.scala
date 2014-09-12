@@ -1,6 +1,5 @@
 package inloop.math.timeseries.descriptor
 
-import inloop.math.PersistenceManager
 import inloop.math.timeseries.TFreq
 import java.util.logging.Level
 import java.util.logging.Logger

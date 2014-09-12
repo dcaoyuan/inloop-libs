@@ -4,12 +4,8 @@ package inloop.math.timeseries
  *
  * @author Caoyuan Deng
  */
-import java.util.logging.Logger
-
 class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) with BaseTSer {
   def this() = this(null, TFreq.DAILY)
-
-  private val log = Logger.getLogger(getClass.getName)
 
   private var _isOnCalendarMode = false
 
@@ -51,8 +47,7 @@ class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
         holders(idx) = false
       } else {
         // append at the end: create a new one, add placeholder
-        val holder = createItem(time)
-        internal_addItem_fillTimestamps_InTimeOrder(time, holder)
+        internal_addItem_fillTimestamps_inTimeOrder(time, true)
       }
 
     } finally {
@@ -71,8 +66,7 @@ class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
       val idx = timestamps.indexOfOccurredTime(time)
       if (!(idx >= 0 && idx < holders.size)) {
         // append at the end: create a new one, add placeholder
-        val holder = createItem(time)
-        internal_addItem_fillTimestamps_InTimeOrder(time, holder)
+        internal_addItem_fillTimestamps_inTimeOrder(time, true)
       }
 
     } finally {
@@ -88,7 +82,7 @@ class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
    * @param time
    * @param clearItem
    */
-  private def internal_addItem_fillTimestamps_InTimeOrder(time: Long, holder: Holder): Int = {
+  private def internal_addItem_fillTimestamps_inTimeOrder(time: Long, holder: Holder): Int = {
     // @Note: writeLock timestamps only when insert/append it
     val lastOccurredTime = timestamps.lastOccurredTime
     if (time < lastOccurredTime) {
@@ -218,7 +212,7 @@ class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
       writeLock.unlock
     }
 
-    log.fine("TimestampsLog: " + timestamps.log)
+    log.debug("TimestampsLog: {}", timestamps.log)
     this
   }
 

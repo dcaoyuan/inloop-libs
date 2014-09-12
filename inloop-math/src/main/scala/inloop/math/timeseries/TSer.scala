@@ -2,6 +2,7 @@ package inloop.math.timeseries
 
 import akka.actor.Actor
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import inloop.util.actors.Publisher
 import scala.collection.mutable
@@ -18,7 +19,7 @@ final case class AddAll[V <: TVal](values: Array[V])
  * trait BaseTSer extends TSer, DefaultBaseTSer extends both TSer and BaseTSer, so
  * keep TSer as a trait instead of abstract class.
  */
-trait TSer extends Actor with Publisher {
+trait TSer extends Actor with ActorLogging with Publisher {
 
   //  ----- actor's implementation
   //  val serActor = actor {

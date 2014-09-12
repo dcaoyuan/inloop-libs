@@ -3,9 +3,8 @@ package inloop.math.timeseries.datasource
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import java.util.logging.Level
-import java.util.logging.Logger
 import akka.actor.Actor
+import akka.actor.ActorLogging
 import akka.actor.Props
 import inloop.math.timeseries.TVal
 import inloop.util.actors.Publisher
@@ -19,8 +18,7 @@ import scala.concurrent.duration._
  * @param [V] data storege type
  * @author Caoyuan Deng
  */
-abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor with Publisher {
-  private val log = Logger.getLogger(this.getClass.getName)
+abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor with ActorLogging with Publisher {
 
   type C <: DataContract[_]
 
@@ -71,10 +69,10 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
       if (isRefreshable && flowCount < 5) {
         // refresh from loadedTime for subscribedContracts
         try {
-          log.fine("Got Heartbeat message, going to request data, flowCount=" + flowCount)
+          log.debug("Got Heartbeat message, going to request data, flowCount={}", flowCount)
           requestActor ! RequestData(subscribedContracts)
         } catch {
-          case ex: Throwable => log.log(Level.WARNING, ex.getMessage, ex)
+          case ex: Throwable => log.warning(ex.getMessage)
         }
       } else {
         flowCount -= 1 // give chance to requestData
@@ -93,10 +91,10 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
       case RequestData(contracts) =>
         try {
           flowCount += 1
-          log.fine("Got RequestData message, going to request data, flowCount=" + flowCount)
+          log.debug("Got RequestData message, going to request data, flowCount={}", flowCount)
           requestData(contracts)
         } catch {
-          case ex: Throwable => log.log(Level.WARNING, ex.getMessage, ex)
+          case ex: Throwable => log.warning(ex.getMessage)
         }
     }
   }
@@ -108,18 +106,18 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
         val t0 = System.currentTimeMillis
         try {
           flowCount -= 1
-          log.info("Got DataLoaded message, going to process data, flowCount=" + flowCount)
+          log.info("Got DataLoaded message, going to process data, flowCount={}", flowCount)
           val loadedTime = processData(values, contract)
           if (contract ne null) {
-            log.info("Processed data for " + contract.srcSymbol)
+            log.info("Processed data for {}", contract.srcSymbol)
             contract.loadedTime = math.max(loadedTime, contract.loadedTime)
           }
         } catch {
-          case ex: Throwable => log.log(Level.WARNING, ex.getMessage, ex)
+          case ex: Throwable => log.warning(ex.getMessage)
         }
 
         publish(DataProcessed(contract))
-        log.info("Processed data in " + (System.currentTimeMillis - t0) + "ms")
+        log.info("Processed data in {} ms", System.currentTimeMillis - t0)
     }
   }
 
@@ -134,7 +132,7 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
   // --- public interfaces
 
   def loadData(contracts: Iterable[C]) {
-    log.info("Fired RequestData message for " + contracts.map(_.srcSymbol))
+    log.info("Fired RequestData message for {}", contracts.map(_.srcSymbol))
     // transit to async load reactor to put requests in queue (actor's mailbox)
     requestActor ! RequestData(contracts)
   }
