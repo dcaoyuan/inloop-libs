@@ -4,6 +4,7 @@ import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 import java.util.logging.Logger
+import akka.actor.Actor
 import inloop.math.timeseries.BaseTSer
 import inloop.math.timeseries.TSer
 
@@ -15,12 +16,14 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
 
   protected val Plot = inloop.math.indicator.Plot
 
-  def receive = listenerManagement orElse {
+  protected def indicatorBehavior: Actor.Receive = {
     case ComputeFrom(time) =>
       if (baseSer != null) computeFrom(time)
     case FactorChanged =>
       if (baseSer != null) computeFrom(0)
   }
+
+  def receive = listenerManagement orElse indicatorBehavior
 
   def set(baseSer: BaseTSer)
   def baseSer: BaseTSer
