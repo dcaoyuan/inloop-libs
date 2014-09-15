@@ -14,6 +14,7 @@ object Function {
   def idOf[T <: Function](klass: Class[T], baseSer: BaseTSer, args: Any*) = Id[T](klass, baseSer, args: _*)
 
   def apply[T <: Function](klass: Class[T], baseSer: BaseTSer, args: Any*): T = {
+    // TODO make function actors as children of baseSer actor?
     val id = idOf(klass, baseSer, args: _*)
     idToFunction.get(id) match {
       case null =>

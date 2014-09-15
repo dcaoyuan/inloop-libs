@@ -28,7 +28,7 @@ class TFreq(val unit: TUnit, val nUnits: Int) extends Cloneable with Ordered[TFr
 
   def nextTime(fromTime: Long): Long = unit.timeAfterNUnits(fromTime, nUnits)
 
-  def previousTime(fromTime: Long): Long = unit.timeAfterNUnits(fromTime, -nUnits)
+  def prevTime(fromTime: Long): Long = unit.timeAfterNUnits(fromTime, -nUnits)
 
   def timeAfterNFreqs(fromTime: Long, nFreqs: Int): Long = unit.timeAfterNUnits(fromTime, nUnits * nFreqs)
 

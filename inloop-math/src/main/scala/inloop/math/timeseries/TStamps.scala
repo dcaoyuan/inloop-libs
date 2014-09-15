@@ -570,18 +570,18 @@ object TStamps {
           throw new ConcurrentModificationException
       }
 
-      def hasPrevious: Boolean = {
+      def hasPrev: Boolean = {
         cursorTime >= fromTime
       }
 
-      def previous: Long = {
+      def prev: Long = {
         checkForComodification
         try {
           cursorRow -= 1
-          val previous = if (cursorRow < 0) freq.previousTime(cursorTime) else apply(cursorRow)
-          cursorTime = previous
+          val prev1 = if (cursorRow < 0) freq.prevTime(cursorTime) else apply(cursorRow)
+          cursorTime = prev1
           lastReturnTime = cursorTime
-          return previous
+          return prev1
         } catch {
           case e: IndexOutOfBoundsException =>
             checkForComodification
@@ -593,7 +593,7 @@ object TStamps {
         indexOrNextIndexOfOccurredTime(cursorTime)
       }
 
-      def previousOccurredIndex: Int = {
+      def prevOccurredIndex: Int = {
         indexOrPrevIndexOfOccurredTime(cursorTime)
       }
 
@@ -601,7 +601,7 @@ object TStamps {
         cursorRow
       }
 
-      def previousRow: Int = {
+      def prevRow: Int = {
         cursorRow - 1
       }
     }
@@ -819,18 +819,18 @@ object TStamps {
         }
       }
 
-      def hasPrevious: Boolean = {
+      def hasPrev: Boolean = {
         cursorTime >= fromTime
       }
 
-      def previous: Long = {
+      def prev: Long = {
         checkForComodification
         try {
           cursorRow -= 1
-          val previous = freq.previousTime(cursorTime)
-          cursorTime = previous
+          val prev1 = freq.prevTime(cursorTime)
+          cursorTime = prev1
           lastReturnTime = cursorTime
-          return previous
+          return prev1
         } catch {
           case e: IndexOutOfBoundsException =>
             checkForComodification
@@ -842,13 +842,13 @@ object TStamps {
         indexOrNextIndexOfOccurredTime(cursorTime)
       }
 
-      def previousOccurredIndex: Int = {
+      def prevOccurredIndex: Int = {
         indexOrPrevIndexOfOccurredTime(cursorTime)
       }
 
       def nextRow: Int = cursorRow
 
-      def previousRow: Int = { cursorRow - 1 }
+      def prevRow: Int = { cursorRow - 1 }
     }
 
     // --- methods inherited from traits
@@ -881,15 +881,15 @@ trait TStampsIterator {
 
   def next: Long
 
-  def hasPrevious: Boolean
+  def hasPrev: Boolean
 
-  def previous: Long
+  def prev: Long
 
   def nextOccurredIndex: Int
 
-  def previousOccurredIndex: Int
+  def prevOccurredIndex: Int
 
   def nextRow: Int
 
-  def previousRow: Int
+  def prevRow: Int
 }

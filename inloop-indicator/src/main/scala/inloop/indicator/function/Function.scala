@@ -11,7 +11,7 @@ import inloop.math.signal.Side
 object Function {
   /**
    * a helper function for keeping the same functin form as Function, don't be
-   * puzzled by the name, it actully will return funcion instance
+   * puzzled by the name, it actully will return function instance
    */
   protected def apply[T <: inloop.math.indicator.Function](clazz: Class[T], baseSer: BaseTSer, args: Any*): T = {
     inloop.math.indicator.Function(clazz, baseSer, args: _*)
