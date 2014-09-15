@@ -1,7 +1,7 @@
 package inloop.math.indicator
 
-import inloop.math.timeseries.TSerEvent
 import akka.actor.Actor
+import inloop.math.timeseries.TSerEvent
 import inloop.math.timeseries.BaseTSer
 
 /**

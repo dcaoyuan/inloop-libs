@@ -4,8 +4,6 @@ import inloop.collection.ArrayList
 import inloop.math.indicator.Plot
 import inloop.util
 import java.awt.Color
-import java.util.logging.Level
-import java.util.logging.Logger
 import scala.collection.mutable
 import scala.reflect.ClassTag
 

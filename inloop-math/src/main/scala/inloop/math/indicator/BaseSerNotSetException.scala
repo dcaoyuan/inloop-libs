@@ -5,6 +5,4 @@ package inloop.math.indicator
  *
  * @author Caoyuan Deng
  */
-class BaseSerNotSetException(message: String) extends RuntimeException(message) {
-
-}
+final class BaseSerNotSetException(message: String) extends RuntimeException(message)

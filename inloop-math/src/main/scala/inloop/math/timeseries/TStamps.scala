@@ -651,11 +651,11 @@ object TStamps {
     def rowOfTime(time: Long, freq: TFreq): Int = {
       val lastOccurredIdx = size - 1
       if (lastOccurredIdx == -1) {
-        return -1
+        -1
+      } else {
+        val firstOccurredTime = apply(0)
+        freq.nFreqsBetween(firstOccurredTime, time)
       }
-
-      val firstOccurredTime = apply(0)
-      freq.nFreqsBetween(firstOccurredTime, time)
     }
 
     /**
@@ -664,22 +664,22 @@ object TStamps {
     def timeOfRow(row: Int, freq: TFreq): Long = {
       val lastOccurredIdx = size - 1
       if (lastOccurredIdx < 0) {
-        return 0
+        0
+      } else {
+        val firstOccurredTime = apply(0)
+        freq.timeAfterNFreqs(firstOccurredTime, row)
       }
-
-      val firstOccurredTime = apply(0)
-      freq.timeAfterNFreqs(firstOccurredTime, row)
     }
 
     def lastRow(freq: TFreq): Int = {
       val lastOccurredIdx = size - 1
       if (lastOccurredIdx < 0) {
-        return 0
+        0
+      } else {
+        val firstOccurredTime = apply(0)
+        val lastOccurredTime = apply(lastOccurredIdx)
+        freq.nFreqsBetween(firstOccurredTime, lastOccurredTime)
       }
-
-      val firstOccurredTime = apply(0)
-      val lastOccurredTime = apply(lastOccurredIdx)
-      freq.nFreqsBetween(firstOccurredTime, lastOccurredTime)
     }
 
     def sizeOf(freq: TFreq): Int = {
