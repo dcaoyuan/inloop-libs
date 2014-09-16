@@ -23,7 +23,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
       if (baseSer != null) computeFrom(0)
   }
 
-  def receive = listenerManagement orElse indicatorBehavior
+  def receive = listenerBehavior orElse indicatorBehavior
 
   def set(baseSer: BaseTSer)
   def baseSer: BaseTSer
@@ -89,7 +89,7 @@ trait WithFactors { _: Indicator =>
   def factors_=(factors: Array[Factor]) {
     if (factors != null) {
       val values = new Array[Double](factors.length)
-      var i = 0 
+      var i = 0
       while (i < factors.length) {
         values(i) = factors(i).value
       }

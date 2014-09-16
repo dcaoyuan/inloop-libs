@@ -32,7 +32,7 @@ abstract class PanelIndicator[T <: Indicator: ClassTag]($freq: TFreq) extends Fr
   val indicators = new ArrayList[(T, ValidTime[Thing])]
 
   private var lastFromTime = Long.MaxValue
-  val reactions: Actor.Receive = {
+  private val panelBehavior: Actor.Receive = {
     case PanelIndicator.PanelHeartbeat =>
       computeFrom(lastFromTime)
       lastFromTime = computedTime
@@ -54,6 +54,8 @@ abstract class PanelIndicator[T <: Indicator: ClassTag]($freq: TFreq) extends Fr
       clear(fromTime)
   }
   // TODO listenTo(PanelIndicator)
+
+  override def receive = panelBehavior orElse super.receive
 
   def addSecs(validTimes: collection.Seq[ValidTime[Thing]]) {
     validTimes foreach addThing
@@ -139,7 +141,7 @@ object PanelIndicator extends Actor with ActorLogging with Publisher {
   private var count = 0
   var indicatorCount = 0
 
-  def receive = {
+  def receive = listenerBehavior orElse {
     case PanelHeartbeat =>
       log.info("Publish panel heart beat: {}", listeners.size)
       publish(PanelHeartbeat)

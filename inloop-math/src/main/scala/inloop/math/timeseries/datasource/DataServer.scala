@@ -64,7 +64,7 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
   // --- a proxy actor for HeartBeat event etc, which will detect the speed of
   // refreshing requests, if consumer can not catch up the producer, will drop
   // some requests.
-  def receive = listenerManagement orElse {
+  def receive = listenerBehavior orElse {
     case Heartbeat(interval) =>
       if (isRefreshable && flowCount < 5) {
         // refresh from loadedTime for subscribedContracts

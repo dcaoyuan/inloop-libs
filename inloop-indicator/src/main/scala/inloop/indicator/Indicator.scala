@@ -1,11 +1,13 @@
 package inloop.indicator
 
+import akka.pattern.ask
 import inloop.indicator.function._
 import inloop.math.indicator.Factor
 import inloop.math.indicator.Function
 import inloop.math.indicator.IndicatorHelper
 import inloop.math.signal.Side
 import inloop.math.timeseries.{ DefaultTSer, TVar, BaseTSer, ThingSer }
+import scala.concurrent.duration._
 
 /**
  * @param base series to compute this, not null.
@@ -45,7 +47,7 @@ abstract class Indicator(protected var _baseSer: BaseTSer) extends DefaultTSer
     set(baseSer)
   }
 
-  override def receive = listenerManagement orElse indicatorBehavior
+  override def receive = super.receive orElse indicatorBehavior
 
   def identifier = _identifier
   def identifier_=(identifier: String) {
@@ -68,9 +70,9 @@ abstract class Indicator(protected var _baseSer: BaseTSer) extends DefaultTSer
       // * share same timestamps with baseSer, should be care of ReadWriteLock
       attach(baseSer.timestamps)
 
-      val baseSerReaction = createBaseSerReaction(baseSer)
-      val oriBehavior = receive
-      context.become(oriBehavior orElse baseSerReaction)
+      val baseSerReaction = createBaseSerBehavior(baseSer.self)
+      val originalBehavior = receive
+      context.become(originalBehavior orElse baseSerReaction)
       // TODD how to properly set behavior of sub-classes?
       // TODO listenTo(baseSer)
 

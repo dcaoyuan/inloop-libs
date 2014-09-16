@@ -2,6 +2,7 @@ package inloop.math.indicator
 
 import akka.actor.Actor
 import inloop.math.timeseries.TSerEvent
+import akka.actor.ActorRef
 import inloop.math.timeseries.BaseTSer
 
 /**
@@ -24,11 +25,10 @@ trait IndicatorHelper { me: Indicator =>
    */
   private var fromTime: Long = _ // used by postComputeFrom only
 
-  private var baseSerReaction: Actor.Receive = _
   // remember event's callback to be forwarded in postCompute()
   private var baseSerEventCallBack: TSerEvent.Callback = _
 
-  protected def createBaseSerReaction(baseSer: BaseTSer) = {
+  protected def createBaseSerBehavior(baseSer: ActorRef): Actor.Receive = {
     /**
      * The ser is a result computed from baseSer, so should follow the baseSeries' data changing:
      * 1. In case of series is the same as baseSeries, should respond to
@@ -36,31 +36,27 @@ trait IndicatorHelper { me: Indicator =>
      * 2. In case of series is not the same as baseSeries, should respond to
      *    Loaded, Refresh and Updated event of baseSeries.
      */
-    baseSerReaction = {
-      case TSerEvent.Loaded(_, _, fromTime, toTime, _, callback) =>
-        me.computeFrom(fromTime)
-        baseSerEventCallBack = callback
-      case TSerEvent.Refresh(_, _, fromTime, toTime, _, callback) =>
-        me.computeFrom(fromTime)
-        baseSerEventCallBack = callback
-      case TSerEvent.Updated(_, _, fromTime, toTime, _, callback) =>
-        me.computeFrom(fromTime)
-        baseSerEventCallBack = callback
-      case TSerEvent.Computed(src, _, fromTime, toTime, _, callback) if (src eq baseSer) && (src ne this) =>
-        /**
-         * If the resultSer is the same as baseSer (such as QuoteSer),
-         * the baseSer will fire an event when compute() finished,
-         * then run to here, this may cause a dead loop. So, FinishedComputing
-         * should not react when self eq baseSer
-         */
-        me.computeFrom(fromTime)
-        baseSerEventCallBack = callback
-      case TSerEvent.Cleared(src, _, fromTime, toTime, _, callback) if (src eq baseSer) && (src ne this) =>
-        me.clear(fromTime)
-        baseSerEventCallBack = callback
-    }
-
-    baseSerReaction
+    case TSerEvent.Loaded(_, _, fromTime, toTime, _, callback) =>
+      me.computeFrom(fromTime)
+      baseSerEventCallBack = callback
+    case TSerEvent.Refresh(_, _, fromTime, toTime, _, callback) =>
+      me.computeFrom(fromTime)
+      baseSerEventCallBack = callback
+    case TSerEvent.Updated(_, _, fromTime, toTime, _, callback) =>
+      me.computeFrom(fromTime)
+      baseSerEventCallBack = callback
+    case TSerEvent.Computed(src, _, fromTime, toTime, _, callback) if (src eq baseSer) && (src ne this) =>
+      /**
+       * If the resultSer is the same as baseSer (such as QuoteSer),
+       * the baseSer will fire an event when compute() finished,
+       * then run to here, this may cause a dead loop. So, FinishedComputing
+       * should not react when self eq baseSer
+       */
+      me.computeFrom(fromTime)
+      baseSerEventCallBack = callback
+    case TSerEvent.Cleared(src, _, fromTime, toTime, _, callback) if (src eq baseSer) && (src ne this) =>
+      me.clear(fromTime)
+      baseSerEventCallBack = callback
   }
 
   def preComputeFrom(fromTime: Long): Int = {

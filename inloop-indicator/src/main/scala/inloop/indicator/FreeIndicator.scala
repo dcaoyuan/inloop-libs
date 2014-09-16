@@ -15,7 +15,7 @@ class FreeIndicator(_thing: Thing, _freq: TFreq) extends DefaultBaseTSer(_thing,
 
   private var _identifier: Option[String] = None
 
-  override def receive = listenerManagement orElse indicatorBehavior
+  override def receive = super.receive orElse indicatorBehavior
 
   def identifier = _identifier
   def identifier_=(identifier: String) {

@@ -42,7 +42,7 @@ trait Publisher { _: Actor =>
    *
    * {{{ def receive = listenerManagement orElse … }}}
    */
-  protected def listenerManagement: Actor.Receive = {
+  protected def listenerBehavior: Actor.Receive = {
     case Listen(l) => listeners += l
     case Deafen(l) => listeners -= l
     case WithListeners(f) =>

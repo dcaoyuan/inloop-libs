@@ -4,6 +4,7 @@ import akka.actor.Actor
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
+import inloop.util.actors.AskView
 import inloop.util.actors.Publisher
 import scala.collection.mutable
 
@@ -21,19 +22,13 @@ final case class AddAll[V <: TVal](values: Array[V])
  */
 trait TSer extends Actor with ActorLogging with Publisher {
 
-  //  ----- actor's implementation
-  //  val serActor = actor {
-  //    loop {
-  //      receive { // this actor will possess timestampslog's lock, which should be attached to same thread, so use receive here
-  //        case AddAll(values) => this ++ values
-  //      }
-  //    }
-  //  }
-  //  ----- end of actor's implementation
-
   private val readWriteLock = new ReentrantReadWriteLock
   protected val readLock = readWriteLock.readLock
   protected val writeLock = readWriteLock.writeLock
+
+  def askViewBehavior: Actor.Receive = {
+    case AskView => sender() ! this
+  }
 
   private var _isLoaded: Boolean = false
   def isLoaded = _isLoaded

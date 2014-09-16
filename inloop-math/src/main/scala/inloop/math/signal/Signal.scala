@@ -98,7 +98,7 @@ class Signal(val time: Long, _kind: Kind, val id: Int = 0, val text: String = nu
 
 object Signal extends Actor with Publisher {
 
-  def receive = listenerManagement
+  def receive = listenerBehavior
 
   // --- simple test
   def main(args: Array[String]) {

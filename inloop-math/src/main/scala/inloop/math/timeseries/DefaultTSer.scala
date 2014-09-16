@@ -64,7 +64,7 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
 
   def this() = this(TFreq.DAILY)
 
-  def receive = listenerManagement
+  def receive = listenerBehavior orElse askViewBehavior
 
   def freq = _freq
   def set(freq: TFreq) {
