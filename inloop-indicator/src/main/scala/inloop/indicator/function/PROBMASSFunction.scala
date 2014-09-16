@@ -38,8 +38,8 @@ final class PROBMASSFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   override def set(args: Any*): Unit = {
     args match {
-      case Seq(a0: TVar[Double], a1: TVar[Double], a2: Factor, a3: Factor) =>
-        baseVar = a0
+      case Seq(a0: TVar[_], a1: TVar[_], a2: Factor, a3: Factor) =>
+        baseVar = a0.asInstanceOf[TVar[Double]]
         weight.equals(a1)
         period.equals(a2)
         nInterval.equals(a3)
