@@ -68,8 +68,8 @@ trait WithFactors { _: Indicator =>
     var valueChanged = false
     if (values != null) {
       if (factors.length == values.length) {
-        var i = -1
-        while ({ i += 1; i < values.length }) {
+        var i = 0
+        while (i < values.length) {
           val myFactor = _factors(i)
           val inValue = values(i)
           /** check if changed happens before set myFactor */
@@ -77,6 +77,7 @@ trait WithFactors { _: Indicator =>
             valueChanged = true
           }
           myFactor.value = inValue
+          i += 1
         }
       }
     }
@@ -88,24 +89,26 @@ trait WithFactors { _: Indicator =>
   def factors_=(factors: Array[Factor]) {
     if (factors != null) {
       val values = new Array[Double](factors.length)
-      var i = -1
-      while ({ i += 1; i < factors.length }) {
+      var i = 0 
+      while (i < factors.length) {
         values(i) = factors(i).value
       }
       factorValues = values
+      i += 1
     }
   }
 
   def replaceFactor(oldFactor: Factor, newFactor: Factor) {
     var idxOld = -1
-    var i = -1
+    var i = 0
     var break = false
-    while ({ i += 1; i < factors.length } && !break) {
+    while (i < factors.length && !break) {
       val factor = factors(i)
       if (factor == oldFactor) {
         idxOld = i
         break = true
       }
+      i += 1
     }
 
     if (idxOld != -1) {

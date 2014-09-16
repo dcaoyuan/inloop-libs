@@ -272,10 +272,11 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
   def indexOfOccurredTimeFromHead(time: Long): Int = {
     try {
       readLock.lock
-      var i = -1
-      while ({ i += 1; i < timestamps.size }) {
+      var i = 0
+      while (i < timestamps.size) {
         if (timestamps(i) == time) return i
         else if (timestamps(i) > time) return -1
+        i += 1
       }
 
       -1
@@ -301,10 +302,11 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
   def indexOfOccurredTimeFromTail(time: Long): Int = {
     try {
       readLock.lock
-      var i = timestamps.size
-      while ({ i -= 1; i >= 0 }) {
+      var i = timestamps.size - 1
+      while (i >= 0) {
         if (timestamps(i) == time) return i
         else if (timestamps(i) < time) return -1
+        i -= 1
       }
 
       -1

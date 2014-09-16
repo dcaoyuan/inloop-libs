@@ -18,7 +18,7 @@ class ThingSer(_thing: Thing, _freq: TFreq) extends DefaultBaseTSer(_thing, _fre
   val close = TVar[Double]("C", Plot.OHLC)
   val volume = TVar[Double]("V", Plot.Volume)
   val amount = TVar[Double]("A", Plot.Volume)
-  val isClosed = TVar[Boolean]()
+  val isClosed = TVar[Boolean]("E")
 
   override val exportableVars = List(open, high, low, close, volume, amount)
 }

@@ -112,13 +112,14 @@ trait TSer extends Actor with ActorLogging with Publisher {
     if (size <= 1) {
       true
     } else {
-      var i = -1
-      while ({ i += 1; i < size - 1 }) {
+      var i = 0
+      while (i < size - 1) {
         if (values(i).time < values(i + 1).time) {
           return true
         } else if (values(i).time > values(i + 1).time) {
           return false
         }
+        i += 1
       }
       false
     }

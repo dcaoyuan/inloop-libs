@@ -47,14 +47,15 @@ class IndicatorDescriptor(_serviceClassName: => String, _freq: => TFreq, $factor
      */
     val mySize = this._factors.length
     if (factors != null) {
-      var i = -1
-      while ({ i += 1; i < factors.length }) {
+      var i = 0
+      while (i < factors.length) {
         val newFac = factors(i).clone
         if (i < mySize) {
           this._factors(i) = newFac
         } else {
           this._factors += newFac
         }
+        i += 1
       }
     } else {
       this._factors.clear
