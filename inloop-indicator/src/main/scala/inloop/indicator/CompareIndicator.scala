@@ -8,7 +8,7 @@ import inloop.math.timeseries.ThingSer
  *
  * @author Caoyuan Deng
  */
-class QuoteCompareIndicator($baseSer: BaseTSer) extends Indicator($baseSer) {
+class CompareIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
 
   var serToBeCompared: ThingSer = _
 
@@ -30,16 +30,16 @@ class QuoteCompareIndicator($baseSer: BaseTSer) extends Indicator($baseSer) {
     val begPos = begPosition.value.toInt //math.min((int)begPosition.value(), begIdx);
     val endPos = endPosition.value.toInt //math.min((int)endPosition.value(),   _dataSize - 1);
 
-    val baseQSer = baseSer.asInstanceOf[ThingSer]
+    val baseTSer = baseSer.asInstanceOf[ThingSer]
     /** get first value of baseSer in time frame, it will be the comparing base point */
     var baseNorm = Null.Double
     var row = begPosition.value.toInt
     var end = endPosition.value.toInt
     var break = false
     while (row <= end & !break) {
-      val baseTime = baseQSer.timeOfRow(row)
-      if (baseQSer.exists(baseTime)) {
-        baseNorm = baseQSer.close(baseTime)
+      val baseTime = baseTSer.timeOfRow(row)
+      if (baseTSer.exists(baseTime)) {
+        baseNorm = baseTSer.close(baseTime)
         break = true
       }
 
@@ -76,18 +76,17 @@ class QuoteCompareIndicator($baseSer: BaseTSer) extends Indicator($baseSer) {
          * we should fetch serToBeCompared by time instead by position which may
          * not sync with baseSer.
          */
-        val compareQSer = serToBeCompared.asInstanceOf[ThingSer]
-        if (compareQSer.exists(time)) {
+        if (serToBeCompared.exists(time)) {
           /** get first value of serToBeCompared in time frame */
           if (Null.is(compareNorm)) {
-            compareNorm = compareQSer.close(time)
+            compareNorm = serToBeCompared.close(time)
           }
 
           if (exists(time)) {
-            open(time) = linearAdjust(compareQSer.open(time), compareNorm, baseNorm)
-            high(time) = linearAdjust(compareQSer.high(time), compareNorm, baseNorm)
-            low(time) = linearAdjust(compareQSer.low(time), compareNorm, baseNorm)
-            close(time) = linearAdjust(compareQSer.close(time), compareNorm, baseNorm)
+            open(time) = linearAdjust(serToBeCompared.open(time), compareNorm, baseNorm)
+            high(time) = linearAdjust(serToBeCompared.high(time), compareNorm, baseNorm)
+            low(time) = linearAdjust(serToBeCompared.low(time), compareNorm, baseNorm)
+            close(time) = linearAdjust(serToBeCompared.close(time), compareNorm, baseNorm)
           }
         }
       }
