@@ -12,17 +12,11 @@ import scala.concurrent.duration._
 /**
  * @param base series to compute this, not null.
  */
-abstract class Indicator(protected var _baseSer: BaseTSer) extends DefaultTSer
+abstract class Indicator(val baseSer: BaseTSer) extends DefaultTSer(baseSer.freq)
     with inloop.math.indicator.Indicator
     with IndicatorHelper {
 
   import Indicator._
-
-  /**
-   * Make sure this null args contructor only be called and return instance to
-   * get it registered in desscription etc only. So it just does nothing.
-   */
-  def this() = this(null)
 
   /**
    * @Note
@@ -41,48 +35,24 @@ abstract class Indicator(protected var _baseSer: BaseTSer) extends DefaultTSer
   protected var A: TVar[Double] = _
   protected var E: TVar[Boolean] = _
 
+  // share same timestamps with baseSer, should be care of ReadWriteLock
+  attach(baseSer.timestamps)
+
+  lazy val baseSerBehavior = createBaseSerBehavior(baseSer.self)
+
+  initPredefinedVarsOfBaseSer
+
+  // TODO listenTo(baseSer)
+
+  override def receive = super.receive orElse baseSerBehavior
+
   private var _identifier: Option[String] = None
-
-  if (_baseSer != null) {
-    set(baseSer)
-  }
-
-  override def receive = super.receive orElse indicatorBehavior
-
   def identifier = _identifier
   def identifier_=(identifier: String) {
     _identifier = identifier match {
       case null | "" => None
       case _         => Some(identifier)
     }
-  }
-
-  /**
-   * make sure this method will be called before this instance return to any others:
-   * 1. via constructor (except the no-arg constructor)
-   * 2. via createInstance
-   */
-  def set(baseSer: BaseTSer) {
-    _baseSer = baseSer
-    if (baseSer != null) {
-      super.set(baseSer.freq)
-
-      // * share same timestamps with baseSer, should be care of ReadWriteLock
-      attach(baseSer.timestamps)
-
-      val baseSerReaction = createBaseSerBehavior(baseSer.self)
-      val originalBehavior = receive
-      context.become(originalBehavior orElse baseSerReaction)
-      // TODD how to properly set behavior of sub-classes?
-      // TODO listenTo(baseSer)
-
-      initPredefinedVarsOfBaseSer
-    }
-  }
-
-  def baseSer: BaseTSer = _baseSer
-  def baseSer_=(baseSer: BaseTSer) {
-    set(baseSer)
   }
 
   /**

@@ -16,7 +16,7 @@ import inloop.math.timeseries.TSerEvent
  *
  * @author Caoyuan Deng
  */
-abstract class SignalIndicator($baseSer: BaseTSer) extends Indicator($baseSer) with inloop.math.indicator.SignalIndicator {
+abstract class SignalIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) with inloop.math.indicator.SignalIndicator {
 
   isOverlapping = true
 

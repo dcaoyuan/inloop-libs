@@ -23,7 +23,7 @@ import scala.reflect.ClassTag
  *
  * @author Caoyuan Deng
  */
-class DefaultTSer(private var _freq: TFreq) extends TSer {
+class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
   protected val INIT_CAPACITY = 100
 
   /**
@@ -62,14 +62,7 @@ class DefaultTSer(private var _freq: TFreq) extends TSer {
   /** Short description */
   protected var sname = ""
 
-  def this() = this(TFreq.DAILY)
-
   def receive = listenerBehavior orElse askViewBehavior
-
-  def freq = _freq
-  def set(freq: TFreq) {
-    _freq = freq
-  }
 
   def timestamps: TStamps = _timestamps
   def attach(timestamps: TStamps) {

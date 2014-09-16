@@ -7,12 +7,11 @@ import inloop.math.timeseries.BaseTSer
  *
  * @author Caoyuan Deng
  */
-class TRFunction extends Function {
+class TRFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   val _tr = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
+  override def set(args: Any*): Unit = {
   }
 
   protected def computeSpot(i: Int): Unit = {

@@ -10,7 +10,8 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class STDDEVFunction extends Function {
+class STDDEVFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+
   final protected def stdDev(idx: Int, baseVar: TVar[Double], period: Double): Double = {
     val begIdx = idx - period.toInt + 1
     val endIdx = idx
@@ -23,11 +24,9 @@ class STDDEVFunction extends Function {
 
   val _stdDev = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.period = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    period = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

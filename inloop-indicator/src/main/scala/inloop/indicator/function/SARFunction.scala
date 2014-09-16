@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class SARFunction extends Function {
+class SARFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var initial, step, maximum: Factor = _
 
@@ -18,12 +18,10 @@ class SARFunction extends Function {
 
   val _sar = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.initial = args(0).asInstanceOf[Factor]
-    this.step = args(1).asInstanceOf[Factor]
-    this.maximum = args(2).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    initial = args(0).asInstanceOf[Factor]
+    step = args(1).asInstanceOf[Factor]
+    maximum = args(2).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

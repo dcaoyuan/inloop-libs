@@ -22,7 +22,7 @@ object Function {
         try {
           val function = klass.newInstance
           /** don't forget to call set(baseSer, args) immediatley */
-          function.set(baseSer, args: _*)
+          function.set(args)
           idToFunction.putIfAbsent(id, function)
           function
         } catch {
@@ -43,7 +43,7 @@ trait Function extends TSer {
    * set the function's arguments.
    * @param baseSer, the ser that this function is based, ie. used to compute
    */
-  def set(baseSer: BaseTSer, args: Any*)
+  def set(args: Any*)
 
   /**
    * This method will compute from computedIdx <b>to</b> idx.

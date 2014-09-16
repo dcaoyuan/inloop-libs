@@ -8,18 +8,16 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ADXRFunction extends Function {
+class ADXRFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var periodDi, periodAdx: Factor = _
 
   val _adx = TVar[Double]()
   val _adxr = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.periodDi = args(0).asInstanceOf[Factor]
-    this.periodAdx = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    periodDi = args(0).asInstanceOf[Factor]
+    periodAdx = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int) {

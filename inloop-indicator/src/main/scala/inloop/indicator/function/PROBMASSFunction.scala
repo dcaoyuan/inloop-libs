@@ -9,7 +9,8 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-final class PROBMASSFunction extends Function {
+final class PROBMASSFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+
   protected def probMass(idx: Int, baseVar: TVar[Double], period: Double, nInterval: Double): Array[Array[Double]] = {
     val begIdx = idx - period.intValue + 1
     val endIdx = idx
@@ -35,8 +36,7 @@ final class PROBMASSFunction extends Function {
    */
   var _probMass: Array[Array[Double]] = _
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
+  override def set(args: Any*): Unit = {
     args match {
       case Seq(a0: TVar[Double], a1: TVar[Double], a2: Factor, a3: Factor) =>
         baseVar = a0

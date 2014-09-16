@@ -3,7 +3,6 @@ package inloop.math.indicator
 import akka.actor.Actor
 import inloop.math.timeseries.TSerEvent
 import akka.actor.ActorRef
-import inloop.math.timeseries.BaseTSer
 
 /**
  * A helper class to implement most of the Indicator methods, it can be used

@@ -10,7 +10,8 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MAXFunction extends Function {
+class MAXFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+
   final protected def imax(idx: Int, baseVar: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.imax(idx, baseVar.values, period.toInt, prev)
   }
@@ -20,11 +21,9 @@ class MAXFunction extends Function {
 
   val _max = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.period = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    period = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

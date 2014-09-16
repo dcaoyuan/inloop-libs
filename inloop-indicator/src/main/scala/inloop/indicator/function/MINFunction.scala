@@ -10,7 +10,8 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MINFunction extends Function {
+class MINFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+
   final protected def imin(idx: Int, baseVar: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.imin(idx, baseVar.values, period.toInt, prev)
   }
@@ -20,11 +21,9 @@ class MINFunction extends Function {
 
   val _min = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.period = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    period = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

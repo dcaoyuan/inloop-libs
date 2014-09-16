@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MACDFunction extends Function {
+class MACDFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var periodSlow, periodFast: Factor = _
   var baseVar: TVar[Double] = _
@@ -18,12 +18,10 @@ class MACDFunction extends Function {
 
   val _macd = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.periodSlow = args(1).asInstanceOf[Factor]
-    this.periodFast = args(2).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    periodSlow = args(1).asInstanceOf[Factor]
+    periodFast = args(2).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

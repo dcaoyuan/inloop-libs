@@ -9,7 +9,8 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class EMAFunction extends Function {
+class EMAFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+
   final protected def iema(idx: Int, var1: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.iema(idx, var1.values, period.toInt, prev)
   }
@@ -19,11 +20,9 @@ class EMAFunction extends Function {
 
   val _ema = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.period = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    period = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

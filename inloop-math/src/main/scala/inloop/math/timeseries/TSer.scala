@@ -139,7 +139,6 @@ trait TSer extends Actor with ActorLogging with Publisher {
 
   // --- abstract methods
   def freq: TFreq
-  def set(freq: TFreq)
 
   def timestamps: TStamps
   def attach(timestamps: TStamps)

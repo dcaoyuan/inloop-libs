@@ -9,7 +9,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class BOLLFunction extends Function {
+class BOLLFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var period, alpha: Factor = _
   var baseVar: TVar[Double] = _
@@ -18,12 +18,10 @@ class BOLLFunction extends Function {
   val _bollUpper = TVar[Double]()
   val _bollLower = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.period = args(1).asInstanceOf[Factor]
-    this.alpha = args(2).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    period = args(1).asInstanceOf[Factor]
+    alpha = args(2).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

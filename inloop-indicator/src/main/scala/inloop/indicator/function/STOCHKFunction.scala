@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class STOCHKFunction extends Function {
+class STOCHKFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var period, periodK: Factor = _
 
@@ -16,11 +16,9 @@ class STOCHKFunction extends Function {
 
   val _stochK = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.period = args(0).asInstanceOf[Factor]
-    this.periodK = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    period = args(0).asInstanceOf[Factor]
+    periodK = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

@@ -25,9 +25,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
 
   def receive = listenerBehavior orElse indicatorBehavior
 
-  def set(baseSer: BaseTSer)
   def baseSer: BaseTSer
-  def baseSer_=(baseSer: BaseTSer)
 
   /**
    * If identifier.isDefined, means the baseSer may belong to another one which is of this identifier
@@ -167,7 +165,7 @@ object Indicator {
           val indicator = klass.newInstance
           indicator.factors = factors.toArray // set factors first to avoid multiple computeFrom(0)
           /** don't forget to call set(baseSer) immediatley */
-          indicator.set(baseSer)
+          // TODO indicator.set(baseSer)
           idToIndicator.putIfAbsent(id, indicator)
           indicator.computeFrom(0)
           indicator

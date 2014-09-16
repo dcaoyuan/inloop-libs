@@ -19,15 +19,17 @@ import scala.concurrent.duration._
 /**
  * @author Caoyuan Deng
  */
-abstract class PanelIndicator[T <: Indicator: ClassTag]($freq: TFreq) extends FreeIndicator(null, $freq) {
+abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends FreeIndicator(null, null, _freq) {
+
+  def name: String
 
   private var _sectorKey: String = ""
-  def name: String
-  final lazy val key = name + "_" + sectorKey.trim + "_" + freq.shortName
   def sectorKey = _sectorKey
   def sectorKey_=(sectorKey: String) {
-    this._sectorKey = sectorKey
+    _sectorKey = sectorKey
   }
+
+  final lazy val key = name + "_" + sectorKey.trim + "_" + freq.shortName
 
   val indicators = new ArrayList[(T, ValidTime[Thing])]
 

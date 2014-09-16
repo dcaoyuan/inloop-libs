@@ -7,13 +7,12 @@ import inloop.math.timeseries.BaseTSer
  *
  * @author Caoyuan Deng
  */
-class DMFunction extends Function {
+class DMFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   val _dmPlus = TVar[Double]()
   val _dmMinus = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
+  override def set(args: Any*): Unit = {
   }
 
   protected def computeSpot(i: Int): Unit = {

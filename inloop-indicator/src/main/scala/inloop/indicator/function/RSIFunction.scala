@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class RSIFunction extends Function {
+class RSIFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var period: Factor = _
 
@@ -17,9 +17,7 @@ class RSIFunction extends Function {
 
   val _rsi = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
+  override def set(args: Any*): Unit = {
     this.period = args(0).asInstanceOf[Factor]
   }
 

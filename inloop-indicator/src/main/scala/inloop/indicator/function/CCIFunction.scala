@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class CCIFunction extends Function {
+class CCIFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var alpha, period: Factor = _
 
@@ -17,11 +17,9 @@ class CCIFunction extends Function {
 
   val _cci = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.period = args(0).asInstanceOf[Factor]
-    this.alpha = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    period = args(0).asInstanceOf[Factor]
+    alpha = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

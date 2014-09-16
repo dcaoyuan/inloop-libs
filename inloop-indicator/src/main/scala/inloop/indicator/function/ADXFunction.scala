@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ADXFunction extends Function {
+class ADXFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var periodDi, periodAdx: Factor = _
 
@@ -16,12 +16,11 @@ class ADXFunction extends Function {
 
   val _adx = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer, Nil)
+  override def set(args: Any*): Unit = {
     args match {
       case Seq(a0: Factor, a1: Factor) =>
-        this.periodDi = a0
-        this.periodAdx = a1
+        periodDi = a0
+        periodAdx = a1
     }
   }
 

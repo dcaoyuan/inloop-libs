@@ -9,7 +9,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ZIGZAGFunction extends Function {
+class ZIGZAGFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var percent: Factor = _
 
@@ -22,10 +22,8 @@ class ZIGZAGFunction extends Function {
   val _zigzag = TVar[Double]()
   val _pseudoZigzag = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.percent = args(0).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    percent = args(0).asInstanceOf[Factor]
   }
 
   /**

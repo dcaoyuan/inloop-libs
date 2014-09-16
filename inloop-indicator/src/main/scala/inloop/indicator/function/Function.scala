@@ -19,7 +19,7 @@ object Function {
 }
 
 import Function._
-abstract class Function extends DefaultTSer
+abstract class Function(val baseSer: BaseTSer) extends DefaultTSer(baseSer.freq)
     with inloop.math.indicator.Function {
 
   /**
@@ -34,9 +34,6 @@ abstract class Function extends DefaultTSer
   private var sessionId = Long.MinValue
   protected var computedIdx = Int.MinValue
 
-  /** base series to compute this. */
-  protected var baseSer: BaseTSer = _
-
   /** To store values of open, high, low, close, volume: */
   protected var O: TVar[Double] = _
   protected var H: TVar[Double] = _
@@ -45,13 +42,10 @@ abstract class Function extends DefaultTSer
   protected var V: TVar[Double] = _
   protected var E: TVar[Boolean] = _
 
-  def set(baseSer: BaseTSer, args: Any*) {
-    super.set(baseSer.freq)
+  attach(baseSer.timestamps)
+  initPredefinedVarsOfBaseSer
 
-    this.baseSer = baseSer
-    this.attach(baseSer.timestamps)
-
-    initPredefinedVarsOfBaseSer
+  def set(args: Any*) {
   }
 
   /** override this method to define your own pre-defined vars if necessary */

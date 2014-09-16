@@ -4,7 +4,9 @@ package inloop.indicator
  *
  * @author Caoyuan Deng
  */
-class VOLIndicator extends Indicator {
+import inloop.math.timeseries.BaseTSer
+
+class VOLIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
   sname = "VOL"
   lname = "Volume"
 

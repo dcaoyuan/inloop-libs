@@ -9,18 +9,16 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ROCFunction extends Function {
+class ROCFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var period: Factor = _
   var baseVar: TVar[Double] = _
 
   val _roc = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.baseVar = args(0).asInstanceOf[TVar[Double]]
-    this.period = args(1).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    baseVar = args(0).asInstanceOf[TVar[Double]]
+    period = args(1).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

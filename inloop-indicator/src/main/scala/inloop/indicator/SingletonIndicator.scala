@@ -12,12 +12,14 @@ package inloop.indicator
  *
  * @author Caoyuan Deng
  */
+import inloop.math.timeseries.BaseTSer
+
 object SingletonIndicator {
   protected var singletonInstance: SingletonIndicator = _
 }
 
 import SingletonIndicator._
-abstract class SingletonIndicator extends Indicator {
+abstract class SingletonIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
 
   singletonInstance = this
 

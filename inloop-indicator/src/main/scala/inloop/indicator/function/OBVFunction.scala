@@ -6,12 +6,11 @@ import inloop.math.timeseries.BaseTSer
  *
  * @author Caoyuan Deng
  */
-class OBVFunction extends Function {
+class OBVFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   val _obv = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
+  override def set(args: Any*): Unit = {
   }
 
   protected def computeSpot(i: Int): Unit = {

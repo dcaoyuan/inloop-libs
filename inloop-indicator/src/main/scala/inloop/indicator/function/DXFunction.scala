@@ -8,7 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class DXFunction extends Function {
+class DXFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
   var period: Factor = _
 
@@ -17,10 +17,8 @@ class DXFunction extends Function {
 
   val _dx = TVar[Double]()
 
-  override def set(baseSer: BaseTSer, args: Any*): Unit = {
-    super.set(baseSer)
-
-    this.period = args(0).asInstanceOf[Factor]
+  override def set(args: Any*): Unit = {
+    period = args(0).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {
