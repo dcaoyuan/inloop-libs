@@ -4,18 +4,16 @@ package inloop.math.signal
  *
  * @author Caoyuan Deng
  */
-class Kind(_id: Int) {
+class Kind(protected[signal] val id: Int) {
   def this() = this(0) /* for serializable */
-
-  protected[signal] def id: Int = _id
 
   def isSide: Boolean = id > 0
   def isCorner: Boolean = id < 0
 
-  override def hashCode = _id
+  override def hashCode = id
 
   override def equals(a: Any) = a match {
-    case x: Kind => x.id == _id
+    case x: Kind => x.id == id
     case _       => false
   }
 
@@ -50,7 +48,7 @@ object Kind {
   }
 }
 
-class Side(_id: => Int) extends Kind(_id) {
+final class Side(_id: => Int) extends Kind(_id) {
   def this() = this(0) /* for serializable */
 }
 
@@ -67,7 +65,7 @@ object Side {
   def withId(id: Int): Side = Kind.withId(id).asInstanceOf[Side]
 }
 
-class Corner(_id: => Int) extends Kind(_id) {
+final class Corner(_id: => Int) extends Kind(_id) {
   def this() = this(0) /* for serializable */
 }
 

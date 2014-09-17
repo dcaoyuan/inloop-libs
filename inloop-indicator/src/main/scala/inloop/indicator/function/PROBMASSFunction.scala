@@ -49,11 +49,11 @@ final class PROBMASSFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
   protected def computeSpot(i: Int): Unit = {
     if (weight == null) {
 
-      _probMass = probMass(i, baseVar, period.value, nInterval.value);
+      _probMass = probMass(i, baseVar, period.value, nInterval.value)
 
     } else {
 
-      _probMass = probMass(i, baseVar, weight, period.value, nInterval.value);
+      _probMass = probMass(i, baseVar, weight, period.value, nInterval.value)
 
     }
   }

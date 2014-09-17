@@ -334,10 +334,6 @@ abstract class Indicator(val baseSer: BaseTSer) extends DefaultTSer(baseSer.freq
     Function(classOf[ZIGZAGFunction], baseSer, percent).zigzagSide(sessionId, idx)
   }
 
-  override def dispose {
-    super.dispose
-  }
-
   /**
    * ----------------------------------------------------------------------
    * End of Functions

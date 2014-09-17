@@ -1,8 +1,8 @@
 package inloop.math.indicator
 
 import akka.actor.Actor
-import inloop.math.timeseries.TSerEvent
 import akka.actor.ActorRef
+import inloop.math.timeseries.TSerEvent
 
 /**
  * A helper class to implement most of the Indicator methods, it can be used
@@ -114,16 +114,12 @@ trait IndicatorHelper { me: Indicator =>
 
   def postComputeFrom {
     // construct resultSer's change event, forward baseTSerEventCallBack
-    me.publish(TSerEvent.Computed(
-      self,
+    me.publish(TSerEvent.Computed(self,
       null,
       fromTime,
       me.computedTime,
       null,
       baseSerEventCallBack))
-  }
-
-  def dispose {
   }
 
 }

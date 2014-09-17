@@ -27,7 +27,4 @@ class FreeIndicator(val baseSer: BaseTSer, _thing: Thing, _freq: TFreq) extends 
    */
   def computeFrom(time: Long) {}
   def computedTime: Long = this.lastOccurredTime
-
-  def dispose {}
-
 }

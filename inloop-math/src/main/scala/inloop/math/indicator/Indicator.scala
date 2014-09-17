@@ -39,8 +39,6 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
   def computeFrom(time: Long)
   def computedTime: Long
 
-  def dispose
-
   def compare(another: Indicator): Int = {
     if (this.shortName.equalsIgnoreCase(another.shortName)) {
       if (this.hashCode < another.hashCode) -1 else (if (this.hashCode == another.hashCode) 0 else 1)
@@ -131,7 +129,7 @@ trait WithFactors { _: Indicator =>
    * @see addFactor(..)
    * --------------------------------------------------------------------
    */
-  protected class InnerFactor(name: => String, value: => Double, step: => Double, minValue: => Double, maxValue: => Double) extends Factor(name, value, step, minValue, maxValue) {
+  final protected class InnerFactor(name: => String, value: => Double, step: => Double, minValue: => Double, maxValue: => Double) extends Factor(name, value, step, minValue, maxValue) {
     addFactor(this)
   }
 

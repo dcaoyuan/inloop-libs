@@ -22,11 +22,7 @@ class Factor(var name: String,
   @inline override final def hashCode = value.hashCode
 
   /** this should not be abstract method to get scalac knowing it's an override of @cloneable instead of java.lang.Object#clone */
-  override def clone: Factor = {
-    try {
-      super.clone.asInstanceOf[Factor]
-    } catch { case ex: CloneNotSupportedException => throw new InternalError(ex.toString) }
-  }
+  override def clone: Factor = new Factor(this.name, this.value, this.step, this.minValue, this.maxValue)
 }
 
 case object FactorChanged
