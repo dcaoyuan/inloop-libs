@@ -8,9 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class SARFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var initial, step, maximum: Factor = _
+class SARFunction(_baseSer: BaseTSer, var initial: Factor, var step: Factor, var maximum: Factor) extends Function(_baseSer) {
 
   val _side = TVar[Side]()
   val _ep = TVar[Double]()

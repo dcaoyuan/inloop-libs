@@ -7,9 +7,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class WMSFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period: Factor = _
+class WMSFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
 
   val _wms = TVar[Double]()
 

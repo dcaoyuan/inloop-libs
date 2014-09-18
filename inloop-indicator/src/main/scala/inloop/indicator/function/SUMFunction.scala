@@ -10,14 +10,11 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class SUMFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class SUMFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def isum(idx: Int, baseVar: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.isum(idx, baseVar.values, period.toInt, prev)
   }
-
-  var period: Factor = _
-  var baseVar: TVar[Double] = _
 
   val _sum = TVar[Double]()
 

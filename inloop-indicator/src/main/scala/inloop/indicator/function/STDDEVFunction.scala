@@ -10,7 +10,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class STDDEVFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class STDDEVFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def stdDev(idx: Int, baseVar: TVar[Double], period: Double): Double = {
     val begIdx = idx - period.toInt + 1
@@ -18,9 +18,6 @@ class STDDEVFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
     StatsFunctions.stdDev(baseVar.values, begIdx, endIdx)
   }
-
-  var period: Factor = _
-  var baseVar: TVar[Double] = _
 
   val _stdDev = TVar[Double]()
 

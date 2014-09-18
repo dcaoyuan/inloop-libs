@@ -68,7 +68,7 @@ abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends Fr
   def addThing(validTime: ValidTime[Thing]): Option[T] = {
     validTime.ref.serOf(freq) match {
       case Some(baseSer) =>
-        val ind = inloop.math.indicator.Indicator(classTag[T].runtimeClass.asInstanceOf[Class[T]], baseSer, factors: _*)
+        val ind = baseSer.indicator(classTag[T].runtimeClass.asInstanceOf[Class[T]], factors: _*)
         // TODO listenTo(ind)
         indicators += ((ind, validTime))
         Some(ind)
@@ -79,7 +79,7 @@ abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends Fr
   def removeThing(validTime: ValidTime[Thing]): Option[T] = {
     validTime.ref.serOf(freq) match {
       case Some(baseSer) =>
-        val ind = inloop.math.indicator.Indicator(classTag[T].asInstanceOf[Class[T]], baseSer, factors: _*)
+        val ind = baseSer.indicator(classTag[T].asInstanceOf[Class[T]], factors: _*)
         // TODO deafTo(ind)
         indicators -= ((ind, validTime))
         Some(ind)

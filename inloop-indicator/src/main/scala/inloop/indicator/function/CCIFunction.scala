@@ -8,9 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class CCIFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var alpha, period: Factor = _
+class CCIFunction(_baseSer: BaseTSer, var alpha: Factor, var period: Factor) extends Function(_baseSer) {
 
   val _tp = TVar[Double]()
   val _deviation = TVar[Double]()

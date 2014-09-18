@@ -9,10 +9,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class BOLLFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period, alpha: Factor = _
-  var baseVar: TVar[Double] = _
+class BOLLFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor, var alpha: Factor) extends Function(_baseSer) {
 
   val _bollMiddle = TVar[Double]()
   val _bollUpper = TVar[Double]()

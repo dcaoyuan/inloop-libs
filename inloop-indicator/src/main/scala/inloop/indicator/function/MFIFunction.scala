@@ -7,9 +7,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MFIFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period: Factor = _
+class MFIFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
 
   val _tp = TVar[Double]()
   val _mfPos = TVar[Double]()

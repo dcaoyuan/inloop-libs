@@ -4,12 +4,67 @@ package inloop.math.timeseries
  *
  * @author Caoyuan Deng
  */
+import akka.actor.Props
+import akka.pattern.ask
+import akka.util.Timeout
+import inloop.math.indicator.Factor
+import inloop.math.indicator.Function
+import inloop.math.indicator.Id
+import inloop.math.indicator.Indicator
+import inloop.util.actors.AskView
+import java.util.concurrent.ConcurrentHashMap
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.reflect.ClassTag
+
 class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) with BaseTSer {
   def this() = this(null, TFreq.DAILY)
 
+  private val timeout = Timeout(5.seconds)
   private var _isOnCalendarMode = false
+  private lazy val idToFunction = new ConcurrentHashMap[Id[_ <: Function], Function](8, 0.9f, 1)
+  private lazy val idToIndicator = new ConcurrentHashMap[Id[_ <: Indicator], Indicator](8, 0.9f, 1)
 
   attach(TStamps(INIT_CAPACITY))
+
+  def function[T <: Function: ClassTag](functionClass: Class[T], args: Any*): T = {
+    val id = Id(functionClass, this, args)
+    idToFunction.get(id) match {
+      case null =>
+        /** if got none from idToFunction, try to create new one */
+        try {
+          val props = Props(functionClass, this, args)
+          val ref = context.actorOf(props)
+          val f = (ref ? AskView)(timeout).mapTo[T]
+          val instance = Await.result(f, timeout.duration)
+          idToFunction.putIfAbsent(id, instance)
+          instance
+        } catch {
+          case ex: Throwable => log.error(ex, ex.getMessage); null.asInstanceOf[T]
+        }
+      case x => x.asInstanceOf[T]
+    }
+  }
+
+  def indicator[T <: Indicator: ClassTag](indicatorClass: Class[T], args: Factor*): T = {
+    val id = Id(indicatorClass, this, args)
+    idToIndicator.get(id) match {
+      case null =>
+        /** if got none from idToFunction, try to create new one */
+        try {
+          val props = Props(indicatorClass, this, args)
+          val ref = context.actorOf(props)
+          val f = (ref ? AskView)(timeout).mapTo[T]
+          val instance = Await.result(f, timeout.duration)
+          idToIndicator.putIfAbsent(id, instance)
+          instance.computeFrom(0)
+          instance
+        } catch {
+          case ex: Throwable => log.error(ex, ex.getMessage); null.asInstanceOf[T]
+        }
+      case x => x.asInstanceOf[T]
+    }
+  }
 
   def thing = _thing
 

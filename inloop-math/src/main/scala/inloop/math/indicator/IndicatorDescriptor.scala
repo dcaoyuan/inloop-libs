@@ -93,12 +93,12 @@ class IndicatorDescriptor(_serviceClassName: => String, _freq: => TFreq, $factor
 
           val instance = if (factors.length == 0) {
             // this means this indicatorDescritor's factors may not be set yet, so set a default one now
-            val instancex = Indicator(indx.getClass.asInstanceOf[Class[Indicator]], baseSer)
+            val instancex = baseSer.indicator(indx.getClass.asInstanceOf[Class[Indicator]])
             factors = instancex.factors
             instancex
           } else {
             // should set facs here, because it's from one that is stored in xml
-            Indicator(indx.getClass.asInstanceOf[Class[Indicator]], baseSer, factors: _*)
+            baseSer.indicator(indx.getClass.asInstanceOf[Class[Indicator]], factors: _*)
           }
 
           Option(instance)

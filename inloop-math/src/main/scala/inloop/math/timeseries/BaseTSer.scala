@@ -5,6 +5,11 @@ package inloop.math.timeseries
  * @author Caoyuan Deng
  */
 
+import inloop.math.indicator.Factor
+import inloop.math.indicator.Function
+import inloop.math.indicator.Indicator
+import scala.reflect.ClassTag
+
 trait BaseTSer extends TSer {
 
   def thing: Thing
@@ -26,5 +31,7 @@ trait BaseTSer extends TSer {
   def toOnCalendarMode
   def toOnOccurredMode
   def isOnCalendarMode: Boolean
-}
 
+  def function[T <: Function: ClassTag](functionClass: Class[T], args: Any*): T
+  def indicator[T <: Indicator: ClassTag](indicatorClass: Class[T], args: Factor*): T
+}

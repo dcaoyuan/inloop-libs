@@ -9,14 +9,11 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class EMAFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class EMAFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def iema(idx: Int, var1: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.iema(idx, var1.values, period.toInt, prev)
   }
-
-  var period: Factor = _
-  var baseVar: TVar[Double] = _
 
   val _ema = TVar[Double]()
 

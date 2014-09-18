@@ -8,9 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class RSIFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period: Factor = _
+class RSIFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
 
   val _up = TVar[Double]()
   val _dn = TVar[Double]()
@@ -18,7 +16,7 @@ class RSIFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
   val _rsi = TVar[Double]()
 
   override def set(args: Any*): Unit = {
-    this.period = args(0).asInstanceOf[Factor]
+    period = args(0).asInstanceOf[Factor]
   }
 
   protected def computeSpot(i: Int): Unit = {

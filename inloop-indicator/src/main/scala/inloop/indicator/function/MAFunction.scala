@@ -10,21 +10,18 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MAFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class MAFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def ima(idx: Int, baseVar: TVar[Double], period: Double, prev: Double): Double = {
     return StatsFunctions.ima(idx, baseVar.values, period.toInt, prev)
   }
 
-  var period: Factor = _
-  var baseVar: TVar[Double] = _
-
   val _ma = TVar[Double]()
 
   override def set(args: Any*): Unit = {
     args match {
-      case Seq(a0: TVar[Double], a1: Factor) =>
-        baseVar = a0
+      case Seq(a0: TVar[_], a1: Factor) =>
+        baseVar = a0.asInstanceOf[TVar[Double]]
         period = a1
     }
   }

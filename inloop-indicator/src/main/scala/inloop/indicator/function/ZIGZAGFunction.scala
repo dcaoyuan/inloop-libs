@@ -9,9 +9,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ZIGZAGFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var percent: Factor = _
+class ZIGZAGFunction(_baseSer: BaseTSer, var percent: Factor) extends Function(_baseSer) {
 
   val _peakHi = TVar[Double]()
   val _peakLo = TVar[Double]()

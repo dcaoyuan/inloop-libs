@@ -7,9 +7,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class STOCHJFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period, periodK, periodD: Factor = _
+class STOCHJFunction(_baseSer: BaseTSer, var period: Factor, var periodK: Factor, var periodD: Factor) extends Function(_baseSer) {
 
   val _stochK = TVar[Double]()
   val _stochD = TVar[Double]()

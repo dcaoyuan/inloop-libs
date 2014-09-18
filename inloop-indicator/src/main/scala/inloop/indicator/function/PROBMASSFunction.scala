@@ -9,7 +9,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-final class PROBMASSFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+final class PROBMASSFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var weight: TVar[Double], var period: Factor, var nInterval: Factor) extends Function(_baseSer) {
 
   protected def probMass(idx: Int, baseVar: TVar[Double], period: Double, nInterval: Double): Array[Array[Double]] = {
     val begIdx = idx - period.intValue + 1
@@ -24,12 +24,6 @@ final class PROBMASSFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
 
     StatsFunctions.probMass(baseVar.values, weight.values, begIdx, endIdx, nInterval.intValue)
   }
-
-  var period: Factor = _
-  var nInterval: Factor = _
-
-  var baseVar: TVar[Double] = _
-  var weight: TVar[Double] = _
 
   /**
    * as this function do not remember previous valus, do not need a Var as probMass

@@ -9,10 +9,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ROCFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period: Factor = _
-  var baseVar: TVar[Double] = _
+class ROCFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   val _roc = TVar[Double]()
 

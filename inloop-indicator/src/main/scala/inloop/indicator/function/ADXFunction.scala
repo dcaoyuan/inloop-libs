@@ -8,9 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class ADXFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var periodDi, periodAdx: Factor = _
+class ADXFunction(_baseSer: BaseTSer, var periodDi: Factor, var periodAdx: Factor) extends Function(_baseSer) {
 
   val _dx = TVar[Double]()
 

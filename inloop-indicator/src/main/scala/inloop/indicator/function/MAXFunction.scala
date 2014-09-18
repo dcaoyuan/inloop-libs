@@ -10,14 +10,11 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MAXFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class MAXFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def imax(idx: Int, baseVar: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.imax(idx, baseVar.values, period.toInt, prev)
   }
-
-  var period: Factor = _
-  var baseVar: TVar[Double] = _
 
   val _max = TVar[Double]()
 

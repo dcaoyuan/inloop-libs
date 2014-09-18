@@ -1,9 +1,6 @@
 package inloop.math.indicator
 
 import java.text.DecimalFormat
-import java.util.concurrent.ConcurrentHashMap
-import java.util.logging.Level
-import java.util.logging.Logger
 import akka.actor.Actor
 import inloop.math.timeseries.BaseTSer
 import inloop.math.timeseries.TSer
@@ -146,37 +143,8 @@ trait WithFactors { _: Indicator =>
 }
 
 object Indicator {
-  private val log = Logger.getLogger(this.getClass.getName)
 
   private val FAC_DECIMAL_FORMAT = new DecimalFormat("0.###")
-
-  private val idToIndicator = new ConcurrentHashMap[Id[_ <: Indicator], Indicator](8, 0.9f, 1)
-
-  def idOf[T <: Indicator](klass: Class[T], baseSer: BaseTSer, factors: Factor*) = Id[T](klass, baseSer, factors: _*)
-
-  def apply[T <: Indicator](klass: Class[T], baseSer: BaseTSer, factors: Factor*): T = {
-    val id = idOf(klass, baseSer, factors: _*)
-    idToIndicator.get(id) match {
-      case null =>
-        /** if got none from idToIndicator, try to create new one */
-        try {
-          val indicator = klass.newInstance
-          indicator.factors = factors.toArray // set factors first to avoid multiple computeFrom(0)
-          /** don't forget to call set(baseSer) immediatley */
-          // TODO indicator.set(baseSer)
-          idToIndicator.putIfAbsent(id, indicator)
-          indicator.computeFrom(0)
-          indicator
-        } catch {
-          case ex: Throwable => log.log(Level.SEVERE, ex.getMessage, ex); null.asInstanceOf[T]
-        }
-      case x => x.asInstanceOf[T]
-    }
-  }
-
-  def releaseAll() {
-    idToIndicator.clear
-  }
 
   def displayName(ser: TSer): String = ser match {
     case x: Indicator => displayName(ser.shortName, x.factors)

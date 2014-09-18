@@ -6,6 +6,9 @@ package inloop.math.indicator
  *       it could be baseSer or name string etc
  */
 
+import inloop.math.timeseries.TSer
+import inloop.math.timeseries.TVar
+
 final class Id[T](val klass: Class[T], val keyRef: AnyRef, val args: Any*) {
 
   @inline override def equals(o: Any): Boolean = {
@@ -16,7 +19,13 @@ final class Id[T](val klass: Class[T], val keyRef: AnyRef, val args: Any*) {
         val itr1 = this.args.iterator
         val itr2 = args.iterator
         while (itr1.hasNext && itr2.hasNext) {
-          if (itr1.next != itr2.next) {
+          val arg1 = itr1.next
+          val arg2 = itr2.next
+          if (arg1.isInstanceOf[TVar[_]] || arg1.isInstanceOf[TSer] || arg2.isInstanceOf[TVar[_]] || arg2.isInstanceOf[TSer]) {
+            if (arg1.asInstanceOf[AnyRef] ne arg2.asInstanceOf[AnyRef]) {
+              return false
+            }
+          } else if (itr1.next != itr2.next) {
             return false
           }
         }

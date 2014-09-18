@@ -8,10 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MACDFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var periodSlow, periodFast: Factor = _
-  var baseVar: TVar[Double] = _
+class MACDFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var periodSlow: Factor, var periodFast: Factor) extends Function(_baseSer) {
 
   val _emaFast = TVar[Double]()
   val _emaSlow = TVar[Double]()

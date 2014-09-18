@@ -8,9 +8,7 @@ import inloop.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class DXFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
-
-  var period: Factor = _
+class DXFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
 
   val _diPlus = TVar[Double]()
   val _diMinus = TVar[Double]()
