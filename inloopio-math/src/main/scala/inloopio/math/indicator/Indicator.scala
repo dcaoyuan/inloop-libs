@@ -20,7 +20,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
       if (baseSer != null) computeFrom(0)
   }
 
-  def receive = listenerBehavior orElse indicatorBehavior
+  def receive = publishableBehavior orElse indicatorBehavior
 
   def baseSer: BaseTSer
 

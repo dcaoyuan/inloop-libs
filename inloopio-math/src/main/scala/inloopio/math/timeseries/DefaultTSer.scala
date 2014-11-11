@@ -62,7 +62,7 @@ class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
   /** Short description */
   protected var sname = ""
 
-  def receive = listenerBehavior orElse askViewBehavior
+  def receive = publishableBehavior orElse askViewBehavior
 
   def timestamps: TStamps = _timestamps
   def attach(timestamps: TStamps) {

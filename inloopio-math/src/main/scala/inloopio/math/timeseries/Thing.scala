@@ -1,15 +1,16 @@
 package inloopio.math.timeseries
 
 import akka.actor.Actor
+import akka.actor.ActorLogging
 import inloopio.math.timeseries.datasource.DataContract
 import inloopio.math.timeseries.descriptor.Content
-import inloopio.util.actors.Publisher
+import inloopio.util.actors.Publishable
 
 /**
  *
  * @author Caoyuan Deng
  */
-trait Thing extends Actor with Publisher {
+trait Thing extends Actor with ActorLogging with Publishable {
   type T <: BaseTSer
   type C <: DataContract[_]
 

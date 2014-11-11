@@ -11,7 +11,7 @@ import inloopio.math.timeseries.TSerEvent
 import inloopio.math.timeseries.Thing
 import inloopio.util
 import inloopio.util.ValidTime
-import inloopio.util.actors.Publisher
+import inloopio.util.actors.Publishable
 import java.util.concurrent.ConcurrentHashMap
 import scala.reflect._
 import scala.concurrent.duration._
@@ -133,7 +133,7 @@ abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends Fr
   }
 }
 
-object PanelIndicator extends Actor with ActorLogging with Publisher {
+object PanelIndicator extends Actor with ActorLogging with Publishable {
 
   private val idToIndicator = new ConcurrentHashMap[Id[_ <: PanelIndicator[_ <: Indicator]], PanelIndicator[_ <: Indicator]](8, 0.9f, 1)
 
@@ -143,9 +143,8 @@ object PanelIndicator extends Actor with ActorLogging with Publisher {
   private var count = 0
   var indicatorCount = 0
 
-  def receive = listenerBehavior orElse {
+  def receive = publishableBehavior orElse {
     case PanelHeartbeat =>
-      log.info("Publish panel heart beat: {}", listeners.size)
       publish(PanelHeartbeat)
     //          count += 1
     //          if (count > 10){

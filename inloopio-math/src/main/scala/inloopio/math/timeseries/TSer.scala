@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import inloopio.util.actors.AskView
-import inloopio.util.actors.Publisher
+import inloopio.util.actors.Publishable
 import scala.collection.mutable
 
 /**
@@ -20,7 +20,7 @@ final case class AddAll[V <: TVal](values: Array[V])
  * trait BaseTSer extends TSer, DefaultBaseTSer extends both TSer and BaseTSer, so
  * keep TSer as a trait instead of abstract class.
  */
-trait TSer extends Actor with ActorLogging with Publisher {
+trait TSer extends Actor with ActorLogging with Publishable {
 
   private val readWriteLock = new ReentrantReadWriteLock
   protected val readLock = readWriteLock.readLock

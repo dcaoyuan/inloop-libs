@@ -100,10 +100,11 @@ object Dependencies {
 
   val scala_xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.2"
   val akka_actor = "com.typesafe.akka" %% "akka-actor" % AKKA_VERSION
+  val akka_contrib = "com.typesafe.akka" %% "akka-contrib" % AKKA_VERSION
   val akka_testkit = "com.typesafe.akka" %% "akka-testkit" % AKKA_VERSION % "test"
   val scalatest = "org.scalatest" %% "scalatest" % "2.1.3" % "test"
   val specs2 = "org.specs2" %% "specs2" % "2.3.11" % "test"
 
-  val all = Seq(scala_xml, akka_actor, scalatest, akka_testkit, specs2)
+  val all = Seq(scala_xml, akka_actor, akka_contrib, scalatest, akka_testkit, specs2)
 
 }
