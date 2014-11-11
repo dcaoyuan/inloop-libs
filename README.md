@@ -1,4 +1,4 @@
-inloop-libs
+inloopio-libs
 ===========
 
 Misc. Scala Libraries. 

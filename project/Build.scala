@@ -7,28 +7,28 @@ import com.typesafe.sbt.osgi.OsgiKeys._
 
 object Build extends sbt.Build {
 
-  lazy val root = Project("inloop-libs-root", file("."))
-    .aggregate(inloop_util, inloop_math, inloop_indicator)
+  lazy val root = Project("inloopio-libs-root", file("."))
+    .aggregate(inloopio_util, inloopio_math, inloopio_indicator)
     .settings(basicSettings: _*)
     .settings(noPublishing: _*)
 
-  lazy val inloop_util = Project("inloop-util", file("inloop-util"))
+  lazy val inloopio_util = Project("inloopio-util", file("inloopio-util"))
     .settings(defaultOsgiSettings: _*)
     .settings(basicSettings: _*)
     .settings(formatSettings: _*)
     .settings(releaseSettings: _*)
     .settings(libraryDependencies ++= Dependencies.all)
 
-  lazy val inloop_math = Project("inloop-math", file("inloop-math"))
-    .dependsOn(inloop_util)
+  lazy val inloopio_math = Project("inloopio-math", file("inloopio-math"))
+    .dependsOn(inloopio_util)
     .settings(defaultOsgiSettings: _*)
     .settings(basicSettings: _*)
     .settings(formatSettings: _*)
     .settings(releaseSettings: _*)
     .settings(libraryDependencies ++= Dependencies.all)
 
-  lazy val inloop_indicator = Project("inloop-indicator", file("inloop-indicator"))
-    .dependsOn(inloop_util, inloop_math)
+  lazy val inloopio_indicator = Project("inloopio-indicator", file("inloopio-indicator"))
+    .dependsOn(inloopio_util, inloopio_math)
     .settings(defaultOsgiSettings: _*)
     .settings(basicSettings: _*)
     .settings(formatSettings: _*)
@@ -40,7 +40,7 @@ object Build extends sbt.Build {
   lazy val basicSettings = Seq(
     organization := "io.inloop",
     version := "0.1.0-SNAPSHOT",
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.11.4",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
     resolvers ++= Seq(
       "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
@@ -60,7 +60,7 @@ object Build extends sbt.Build {
     publishArtifact in Test := false,
     pomIncludeRepository := { (repo: MavenRepository) => false },
     pomExtra := (
-      <url>https://github.com/dcaoyuan/inloop-libs</url>
+      <url>https://github.com/dcaoyuan/inloopio-libs</url>
       <licenses>
         <license>
           <name>The BSD 3-Clause License</name>
@@ -69,8 +69,8 @@ object Build extends sbt.Build {
         </license>
       </licenses>
       <scm>
-        <url>git@github.com:dcaoyuan/inloop-libs.git</url>
-        <connection>scm:git:git@github.com:dcaoyuan/inloop-libs.git</connection>
+        <url>git@github.com:dcaoyuan/inloopio-libs.git</url>
+        <connection>scm:git:git@github.com:dcaoyuan/inloopio-libs.git</connection>
       </scm>))
 
   lazy val noPublishing = Seq(
@@ -96,13 +96,14 @@ object Build extends sbt.Build {
 }
 
 object Dependencies {
-  val AKKA_VERSION = "2.3.5"
+  val AKKA_VERSION = "2.3.6"
 
+  val scala_xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.2"
   val akka_actor = "com.typesafe.akka" %% "akka-actor" % AKKA_VERSION
   val akka_testkit = "com.typesafe.akka" %% "akka-testkit" % AKKA_VERSION % "test"
   val scalatest = "org.scalatest" %% "scalatest" % "2.1.3" % "test"
   val specs2 = "org.specs2" %% "specs2" % "2.3.11" % "test"
 
-  val all = Seq(akka_actor, scalatest, akka_testkit, specs2)
+  val all = Seq(scala_xml, akka_actor, scalatest, akka_testkit, specs2)
 
 }
