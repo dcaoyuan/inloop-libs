@@ -1,5 +1,6 @@
 import sbt._
 import sbt.Keys._
+import bintray.Plugin._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import com.typesafe.sbt.osgi.SbtOsgi._
@@ -13,26 +14,29 @@ object Build extends sbt.Build {
     .settings(noPublishing: _*)
 
   lazy val inloopio_util = Project("inloopio-util", file("inloopio-util"))
-    .settings(defaultOsgiSettings: _*)
+    //.settings(defaultOsgiSettings: _*)
     .settings(basicSettings: _*)
     .settings(formatSettings: _*)
-    .settings(releaseSettings: _*)
+    //.settings(releaseSettings: _*)
+    .settings(bintrayPublishSettings ++ sbtBintraySettings: _*)
     .settings(libraryDependencies ++= Dependencies.all)
 
   lazy val inloopio_math = Project("inloopio-math", file("inloopio-math"))
     .dependsOn(inloopio_util)
-    .settings(defaultOsgiSettings: _*)
+    //.settings(defaultOsgiSettings: _*)
     .settings(basicSettings: _*)
     .settings(formatSettings: _*)
-    .settings(releaseSettings: _*)
+    //.settings(releaseSettings: _*)
+    .settings(bintrayPublishSettings ++ sbtBintraySettings: _*)
     .settings(libraryDependencies ++= Dependencies.all)
 
   lazy val inloopio_indicator = Project("inloopio-indicator", file("inloopio-indicator"))
     .dependsOn(inloopio_util, inloopio_math)
-    .settings(defaultOsgiSettings: _*)
+    //.settings(defaultOsgiSettings: _*)
     .settings(basicSettings: _*)
     .settings(formatSettings: _*)
-    .settings(releaseSettings: _*)
+    //.settings(releaseSettings: _*)
+    .settings(bintrayPublishSettings ++ sbtBintraySettings: _*)
     .settings(libraryDependencies ++= Dependencies.all)
 
 
@@ -59,8 +63,23 @@ object Build extends sbt.Build {
     publishMavenStyle := true,
     publishArtifact in Test := false,
     pomIncludeRepository := { (repo: MavenRepository) => false },
-    pomExtra := (
-      <url>https://github.com/dcaoyuan/inloopio-libs</url>
+    pomExtra := pomXml)
+
+  lazy val noPublishing = Seq(
+    publish := (),
+    publishLocal := (),
+    // required until these tickets are closed https://github.com/sbt/sbt-pgp/issues/42,
+    // https://github.com/sbt/sbt-pgp/issues/36
+    publishTo := None)
+
+  lazy val sbtBintraySettings = Seq(
+    licenses += ("BSD New", url("http://opensource.org/licenses/BSD-3-Clause")),
+    publishMavenStyle := true,
+    pomExtra := pomXml,
+    bintray.Keys.repository in bintray.Keys.bintray := "snapshots",
+    publishArtifact in Test := false)
+
+  lazy val pomXml = (<url>https://github.com/dcaoyuan/inloopio-libs</url>
       <licenses>
         <license>
           <name>The BSD 3-Clause License</name>
@@ -71,14 +90,7 @@ object Build extends sbt.Build {
       <scm>
         <url>git@github.com:dcaoyuan/inloopio-libs.git</url>
         <connection>scm:git:git@github.com:dcaoyuan/inloopio-libs.git</connection>
-      </scm>))
-
-  lazy val noPublishing = Seq(
-    publish := (),
-    publishLocal := (),
-    // required until these tickets are closed https://github.com/sbt/sbt-pgp/issues/42,
-    // https://github.com/sbt/sbt-pgp/issues/36
-    publishTo := None)
+      </scm>)
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
     ScalariformKeys.preferences in Compile := formattingPreferences,
