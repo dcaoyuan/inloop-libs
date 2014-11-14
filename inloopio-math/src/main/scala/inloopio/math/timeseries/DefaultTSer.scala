@@ -375,13 +375,14 @@ class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
   override def hashCode: Int = _hashCode
 
   object TVar {
-    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", true, Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, true, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, true, plot)
-    def apply[V: ClassTag](name: String, isInstant: Boolean, plot: Plot): TVar[V] = new InnerTVar[V](name, isInstant, plot)
+    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", true, OhlcType.Close, Plot.None)
+    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, true, OhlcType.Close, Plot.None)
+    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, true, OhlcType.Close, plot)
+    def apply[V: ClassTag](name: String, ohlcType: OhlcType, plot: Plot): TVar[V] = new InnerTVar[V](name, true, ohlcType, plot)
+    def apply[V: ClassTag](name: String, isInstantVar: Boolean, ohlcType: OhlcType, plot: Plot): TVar[V] = new InnerTVar[V](name, isInstantVar, ohlcType, plot)
   }
 
-  final protected class InnerTVar[V: ClassTag](_name: String, _isInstant: Boolean, _plot: Plot) extends AbstractInnerTVar[V](_name, _isInstant, _plot) {
+  final protected class InnerTVar[V: ClassTag](_name: String, _isInstantVar: Boolean, _ohlcType: OhlcType, _plot: Plot) extends AbstractInnerTVar[V](_name, _isInstantVar, _ohlcType, _plot) {
 
     private var _values = new ArrayList[V](INIT_CAPACITY)
     def values = _values
@@ -511,7 +512,7 @@ class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * operation on values, including add, delete actions will be consistant by
    * cooperating with DefaultSer.
    */
-  abstract class AbstractInnerTVar[V: ClassTag](var name: String, var isInstant: Boolean, var plot: Plot) extends TVar[V] {
+  abstract class AbstractInnerTVar[V: ClassTag](var name: String, val isInstantVar: Boolean, val ohlcType: OhlcType, val plot: Plot) extends TVar[V] {
 
     addVar(this)
 

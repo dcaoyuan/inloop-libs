@@ -10,7 +10,6 @@ import inloopio.util.actors.Publishable
  * @author Caoyuan Deng
  */
 trait Thing extends Publishable { _: Actor =>
-  type T <: BaseTSer
 
   def identifier: String
 

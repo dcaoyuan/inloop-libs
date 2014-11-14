@@ -21,7 +21,9 @@ abstract class TVar[V: ClassTag] extends Plottable {
   /**
    * @return Is it an instant variable if true, or an accumulate variable if false.
    */
-  def isInstant: Boolean
+  def isInstantVar: Boolean
+  def isAccumulateVar: Boolean = !isInstantVar
+  def ohlcType: OhlcType
 
   /**
    * Append or insert value at time

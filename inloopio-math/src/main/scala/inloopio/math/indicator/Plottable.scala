@@ -9,7 +9,6 @@ import java.awt.Color
 trait Plottable {
 
   def plot: Plot
-  def plot_=(plot: Plot)
 
   def getColor(idx: Int): Color
   def setColor(idx: Int, color: Color)
