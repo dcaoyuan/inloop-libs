@@ -1,8 +1,7 @@
 package inloopio.math.timeseries
 
 import akka.actor.Actor
-import akka.actor.ActorLogging
-import inloopio.math.timeseries.datasource.DataContract
+import akka.actor.ActorRef
 import inloopio.math.timeseries.descriptor.Content
 import inloopio.util.actors.Publishable
 
@@ -10,30 +9,17 @@ import inloopio.util.actors.Publishable
  *
  * @author Caoyuan Deng
  */
-trait Thing extends Actor with ActorLogging with Publishable {
+trait Thing extends Publishable { _: Actor =>
   type T <: BaseTSer
-  type C <: DataContract[_]
 
   def identifier: String
-  def identifier_=(identifier: String)
 
   def name: String
 
   def description: String
   def description_=(description: String)
 
-  def serOf(freq: TFreq): Option[T]
-
-  /**
-   * Load sers, can be called to load ser whenever
-   * If there is already a dataServer is running and not finished, don't load again.
-   * @return boolean: if run sucessfully, ie. load begins, return true, else return false.
-   */
-  def loadSer(ser: T): Boolean
-  def putSer(ser: T)
-  def resetSers
-
-  def stopAllDataServer
+  def serOf(freq: TFreq): Option[ActorRef]
 
   /**
    * The content of each symbol should be got automatailly from PersistenceManager.restoreContent
@@ -44,6 +30,6 @@ trait Thing extends Actor with ActorLogging with Publishable {
   /**
    * A helper method which can be overridden to get another ser provider from identifier
    */
-  def thingOf(identifier: String): Option[Thing]
+  def thingOf(identifier: String): Option[Thing] = None
 }
 

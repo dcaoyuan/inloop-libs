@@ -66,25 +66,27 @@ abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends Fr
   }
 
   def addThing(validTime: ValidTime[Thing]): Option[T] = {
-    validTime.ref.serOf(freq) match {
-      case Some(baseSer) =>
-        val ind = baseSer.indicator(classTag[T].runtimeClass.asInstanceOf[Class[T]], factors: _*)
-        // TODO listenTo(ind)
-        indicators += ((ind, validTime))
-        Some(ind)
-      case _ => None
-    }
+    //    validTime.ref.serOf(freq) match {
+    //      case Some(baseSer) =>
+    //        val ind = baseSer.indicator(classTag[T].runtimeClass.asInstanceOf[Class[T]], factors: _*)
+    //        // TODO listenTo(ind)
+    //        indicators += ((ind, validTime))
+    //        Some(ind)
+    //      case _ => None
+    //    }
+    None // TODO
   }
 
   def removeThing(validTime: ValidTime[Thing]): Option[T] = {
-    validTime.ref.serOf(freq) match {
-      case Some(baseSer) =>
-        val ind = baseSer.indicator(classTag[T].asInstanceOf[Class[T]], factors: _*)
-        // TODO deafTo(ind)
-        indicators -= ((ind, validTime))
-        Some(ind)
-      case _ => None
-    }
+    //    validTime.ref.serOf(freq) match {
+    //      case Some(baseSer) =>
+    //        val ind = baseSer.indicator(classTag[T].asInstanceOf[Class[T]], factors: _*)
+    //        // TODO deafTo(ind)
+    //        indicators -= ((ind, validTime))
+    //        Some(ind)
+    //      case _ => None
+    //    }
+    None // TODO
   }
 
   def descriptor = "(" + this.getClass.getSimpleName + "," + sectorKey + "," + freq.shortName + ")"

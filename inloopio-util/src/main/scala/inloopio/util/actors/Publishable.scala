@@ -22,7 +22,7 @@ trait Publishable { _: Actor =>
   def log: LoggingAdapter
 
   val groupRouter = Router(
-    context.system.settings.config.getString("routing-logic") match {
+    context.system.settings.config.getString("inloopio.publishable.routing-logic") match {
       case "random"             => RandomRoutingLogic()
       case "round-robin"        => RoundRobinRoutingLogic()
       case "consistent-hashing" => ConsistentHashingRoutingLogic(context.system)
