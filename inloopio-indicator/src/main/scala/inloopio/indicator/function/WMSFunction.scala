@@ -1,13 +1,13 @@
 package inloopio.indicator.function
 
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class WMSFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
+class WMSFunction(_baseSer: TBaseSer, var period: Factor) extends Function(_baseSer) {
 
   val _wms = TVar[Double]()
 

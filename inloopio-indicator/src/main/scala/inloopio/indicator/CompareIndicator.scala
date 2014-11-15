@@ -1,6 +1,6 @@
 package inloopio.indicator
 
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.Null
 import inloopio.math.timeseries.ThingSer
 
@@ -8,7 +8,7 @@ import inloopio.math.timeseries.ThingSer
  *
  * @author Caoyuan Deng
  */
-class CompareIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
+class CompareIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) {
 
   var serToBeCompared: ThingSer = _
 
@@ -30,16 +30,16 @@ class CompareIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
     val begPos = begPosition.value.toInt //math.min((int)begPosition.value(), begIdx);
     val endPos = endPosition.value.toInt //math.min((int)endPosition.value(),   _dataSize - 1);
 
-    val baseTSer = baseSer.asInstanceOf[ThingSer]
+    val tbaseSer = baseSer.asInstanceOf[ThingSer]
     /** get first value of baseSer in time frame, it will be the comparing base point */
     var baseNorm = Null.Double
     var row = begPosition.value.toInt
     var end = endPosition.value.toInt
     var break = false
     while (row <= end & !break) {
-      val baseTime = baseTSer.timeOfRow(row)
-      if (baseTSer.exists(baseTime)) {
-        baseNorm = baseTSer.close(baseTime)
+      val baseTime = tbaseSer.timeOfRow(row)
+      if (tbaseSer.exists(baseTime)) {
+        baseNorm = tbaseSer.close(baseTime)
         break = true
       }
 
@@ -69,7 +69,7 @@ class CompareIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
         /** don't calulate those is less than beginPosition to got a proper compareBeginValue */
       } else {
 
-        val time = baseSer.asInstanceOf[BaseTSer].timeOfRow(i)
+        val time = baseSer.asInstanceOf[TBaseSer].timeOfRow(i)
 
         /**
          * !NOTICE:

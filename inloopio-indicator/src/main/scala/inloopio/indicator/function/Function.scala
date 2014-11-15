@@ -1,6 +1,6 @@
 package inloopio.indicator.function
 
-import inloopio.math.timeseries.{ DefaultTSer, BaseTSer, TVar, Null, ThingSer }
+import inloopio.math.timeseries.{ DefaultTSer, TBaseSer, TVar, Null, ThingSer }
 import inloopio.math.indicator.Factor
 import inloopio.math.signal.Side
 import scala.reflect.ClassTag
@@ -14,13 +14,13 @@ object Function {
    * a helper function for keeping the same functin form as Function, don't be
    * puzzled by the name, it actully will return function instance
    */
-  protected def apply[T <: inloopio.math.indicator.Function: ClassTag](clazz: Class[T], baseSer: BaseTSer, args: Any*): T = {
+  protected def apply[T <: inloopio.math.indicator.Function: ClassTag](clazz: Class[T], baseSer: TBaseSer, args: Any*): T = {
     baseSer.function(clazz, args: _*)
   }
 }
 
 import Function._
-abstract class Function(val baseSer: BaseTSer, args: Any*) extends DefaultTSer(baseSer.freq)
+abstract class Function(val baseSer: TBaseSer, args: Any*) extends DefaultTSer(baseSer.freq)
     with inloopio.math.indicator.Function {
 
   /**

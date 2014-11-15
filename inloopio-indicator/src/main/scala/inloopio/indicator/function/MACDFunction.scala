@@ -1,6 +1,6 @@
 package inloopio.indicator.function
 
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Factor
 
@@ -8,7 +8,7 @@ import inloopio.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MACDFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var periodSlow: Factor, var periodFast: Factor) extends Function(_baseSer) {
+class MACDFunction(_baseSer: TBaseSer, var baseVar: TVar[Double], var periodSlow: Factor, var periodFast: Factor) extends Function(_baseSer) {
 
   val _emaFast = TVar[Double]()
   val _emaSlow = TVar[Double]()

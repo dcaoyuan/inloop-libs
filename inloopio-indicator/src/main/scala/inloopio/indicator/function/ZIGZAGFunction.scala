@@ -2,14 +2,14 @@ package inloopio.indicator.function
 
 import inloopio.math.signal.Side
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class ZIGZAGFunction(_baseSer: BaseTSer, var percent: Factor) extends Function(_baseSer) {
+class ZIGZAGFunction(_baseSer: TBaseSer, var percent: Factor) extends Function(_baseSer) {
 
   val _peakHi = TVar[Double]()
   val _peakLo = TVar[Double]()

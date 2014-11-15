@@ -1,13 +1,13 @@
 package inloopio.indicator.function
 
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class MFIFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
+class MFIFunction(_baseSer: TBaseSer, var period: Factor) extends Function(_baseSer) {
 
   val _tp = TVar[Double]()
   val _mfPos = TVar[Double]()

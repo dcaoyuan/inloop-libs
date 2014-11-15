@@ -8,7 +8,7 @@ import inloopio.math.signal.Side
 import inloopio.math.signal.Sign
 import inloopio.math.signal.Signal
 import inloopio.math.signal.SignalEvent
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TSerEvent
 
 /**
@@ -16,7 +16,7 @@ import inloopio.math.timeseries.TSerEvent
  *
  * @author Caoyuan Deng
  */
-abstract class SignalIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) with inloopio.math.indicator.SignalIndicator {
+abstract class SignalIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) with inloopio.math.indicator.SignalIndicator {
 
   isOverlapping = true
 

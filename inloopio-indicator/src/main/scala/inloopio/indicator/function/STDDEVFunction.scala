@@ -2,7 +2,7 @@ package inloopio.indicator.function
 
 import inloopio.math.StatsFunctions
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Factor
 
@@ -10,7 +10,7 @@ import inloopio.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class STDDEVFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
+class STDDEVFunction(_baseSer: TBaseSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def stdDev(idx: Int, baseVar: TVar[Double], period: Double): Double = {
     val begIdx = idx - period.toInt + 1

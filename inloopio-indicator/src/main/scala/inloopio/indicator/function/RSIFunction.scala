@@ -1,14 +1,14 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class RSIFunction(_baseSer: BaseTSer, var period: Factor) extends Function(_baseSer) {
+class RSIFunction(_baseSer: TBaseSer, var period: Factor) extends Function(_baseSer) {
 
   val _up = TVar[Double]()
   val _dn = TVar[Double]()

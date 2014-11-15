@@ -113,7 +113,7 @@ trait IndicatorHelper { me: Indicator =>
   }
 
   def postComputeFrom {
-    // construct resultSer's change event, forward baseTSerEventCallBack
+    // construct resultSer's change event, forward baseSerEventCallBack
     me.publish(TSerEvent.Computed(self,
       null,
       fromTime,

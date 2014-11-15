@@ -1,14 +1,14 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class STOCHKFunction(_baseSer: BaseTSer, var period: Factor, var periodK: Factor) extends Function(_baseSer) {
+class STOCHKFunction(_baseSer: TBaseSer, var period: Factor, var periodK: Factor) extends Function(_baseSer) {
 
   val _elementK = TVar[Double]()
   val _stochK = TVar[Double]()

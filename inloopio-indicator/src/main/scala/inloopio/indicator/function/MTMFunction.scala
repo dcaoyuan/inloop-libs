@@ -1,7 +1,7 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Factor
 
@@ -9,7 +9,7 @@ import inloopio.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class MTMFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
+class MTMFunction(_baseSer: TBaseSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   val _mtm = TVar[Double]()
 

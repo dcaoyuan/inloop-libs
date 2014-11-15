@@ -17,8 +17,8 @@ import scala.reflect.ClassTag
  * the 'timestamps' is actaully with the same idx correspinding to 'vars'
  *
  *
- * This class implemets all interface of ser and partly BaseTSer.
- * So you can use it as full series, but don't use those methods of BaseTSer
+ * This class implemets all interface of ser and partly TBaseSer.
+ * So you can use it as full series, but don't use those methods of TBaseSer
  * except you sub class this.
  *
  * @author Caoyuan Deng

@@ -1,12 +1,12 @@
 package inloopio.indicator.function
 
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 
 /**
  *
  * @author Caoyuan Deng
  */
-class OBVFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class OBVFunction(_baseSer: TBaseSer) extends Function(_baseSer) {
 
   val _obv = TVar[Double]()
 

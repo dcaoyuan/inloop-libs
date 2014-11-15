@@ -17,7 +17,7 @@ import scala.collection.mutable
 final case class AddAll[V <: TVal](values: Array[V])
 
 /**
- * trait BaseTSer extends TSer, DefaultBaseTSer extends both TSer and BaseTSer, so
+ * trait TBaseSer extends TSer, DefaultTBaseSer extends both TSer and TBaseSer, so
  * keep TSer as a trait instead of abstract class.
  */
 trait TSer extends Actor with ActorLogging with Publishable {

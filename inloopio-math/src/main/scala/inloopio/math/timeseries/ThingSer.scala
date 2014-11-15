@@ -7,7 +7,7 @@ import scala.collection.mutable
  *
  * @author Caoyuan Deng
  */
-class ThingSer(_thing: Thing, _freq: TFreq) extends DefaultBaseTSer(_thing, _freq) {
+class ThingSer(_thing: Thing, _freq: TFreq) extends DefaultTBaseSer(_thing, _freq) {
 
   private var _shortName: String = thing.identifier
   private var _isAdjusted: Boolean = false

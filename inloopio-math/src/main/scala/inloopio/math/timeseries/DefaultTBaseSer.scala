@@ -17,7 +17,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
-class DefaultBaseTSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) with BaseTSer {
+class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) with TBaseSer {
   def this() = this(null, TFreq.DAILY)
 
   private val timeout = Timeout(5.seconds)

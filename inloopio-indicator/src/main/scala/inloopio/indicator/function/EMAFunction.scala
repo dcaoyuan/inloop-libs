@@ -1,7 +1,7 @@
 package inloopio.indicator.function
 
 import inloopio.math.StatsFunctions
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Factor
 
@@ -9,7 +9,7 @@ import inloopio.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-class EMAFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
+class EMAFunction(_baseSer: TBaseSer, var baseVar: TVar[Double], var period: Factor) extends Function(_baseSer) {
 
   final protected def iema(idx: Int, var1: TVar[Double], period: Double, prev: Double): Double = {
     StatsFunctions.iema(idx, var1.values, period.toInt, prev)

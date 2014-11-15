@@ -2,7 +2,7 @@ package inloopio.math.indicator
 
 import java.text.DecimalFormat
 import akka.actor.Actor
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TSer
 
 /**
@@ -22,7 +22,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
 
   def receive = publishableBehavior orElse indicatorBehavior
 
-  def baseSer: BaseTSer
+  def baseSer: TBaseSer
 
   /**
    * If identifier.isDefined, means the baseSer may belong to another one which is of this identifier

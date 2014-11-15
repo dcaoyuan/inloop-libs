@@ -1,14 +1,14 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class ADXFunction(_baseSer: BaseTSer, var periodDi: Factor, var periodAdx: Factor) extends Function(_baseSer) {
+class ADXFunction(_baseSer: TBaseSer, var periodDi: Factor, var periodAdx: Factor) extends Function(_baseSer) {
 
   val _dx = TVar[Double]()
 

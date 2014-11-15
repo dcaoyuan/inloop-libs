@@ -1,14 +1,14 @@
 package inloopio.indicator.function
 
 import inloopio.math.signal.Side
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class SARFunction(_baseSer: BaseTSer, var initial: Factor, var step: Factor, var maximum: Factor) extends Function(_baseSer) {
+class SARFunction(_baseSer: TBaseSer, var initial: Factor, var step: Factor, var maximum: Factor) extends Function(_baseSer) {
 
   val _side = TVar[Side]()
   val _ep = TVar[Double]()

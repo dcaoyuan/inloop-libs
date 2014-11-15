@@ -1,13 +1,13 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 
 /**
  *
  * @author Caoyuan Deng
  */
-class TRFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class TRFunction(_baseSer: TBaseSer) extends Function(_baseSer) {
 
   val _tr = TVar[Double]()
 

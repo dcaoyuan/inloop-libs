@@ -1,9 +1,9 @@
 package inloopio.indicator
 
 import inloopio.collection.ArrayList
-import inloopio.math.timeseries.BaseTSer
 import inloopio.math.timeseries.Null
 import inloopio.math.timeseries.OhlcType
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Plot
 import scala.collection.immutable
@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
  *
  * @author Caoyuan Deng
  */
-abstract class SpotIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) with inloopio.math.indicator.SpotIndicator {
+abstract class SpotIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) with inloopio.math.indicator.SpotIndicator {
 
   def this() = this(null)
 

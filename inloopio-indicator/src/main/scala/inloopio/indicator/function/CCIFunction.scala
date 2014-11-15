@@ -1,14 +1,14 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.indicator.Factor
 
 /**
  *
  * @author Caoyuan Deng
  */
-class CCIFunction(_baseSer: BaseTSer, var alpha: Factor, var period: Factor) extends Function(_baseSer) {
+class CCIFunction(_baseSer: TBaseSer, var alpha: Factor, var period: Factor) extends Function(_baseSer) {
 
   val _tp = TVar[Double]()
   val _deviation = TVar[Double]()

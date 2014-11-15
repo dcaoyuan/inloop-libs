@@ -1,15 +1,14 @@
 package inloopio.indicator
 
-//import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 //import inloopio.securities.model.Sec
 //import inloopio.collection.ArrayList
 //import inloopio.securities.dataserver.RichInfo
 //import inloopio.securities.InfoPointSer
 //import java.util.logging.Logger
 
-import inloopio.math.timeseries.BaseTSer
 
-class InfoPointIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
+class InfoPointIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) {
   //  private val log = Logger.getLogger(this.getClass.getName)
   //
   //  sname = "INFO"
@@ -21,7 +20,7 @@ class InfoPointIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
   //  val exists = TVar[Double]("I", Plot.Info)
   //  val infos = TVar[ArrayList[RichInfo]]("I", Plot.None)
   //
-  //  override def set(baseSer: BaseTSer) {
+  //  override def set(baseSer: TBaseSer) {
   //    // set baseSer to mfSer. @Note, this.freq is not set yet before super.set(mfSer)
   //    val sec = baseSer.serProvider.asInstanceOf[Sec]
   //    val freq = baseSer.freq

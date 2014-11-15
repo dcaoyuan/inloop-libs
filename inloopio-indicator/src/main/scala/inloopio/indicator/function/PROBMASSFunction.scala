@@ -1,7 +1,7 @@
 package inloopio.indicator.function
 
 import inloopio.math.StatsFunctions
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Factor
 
@@ -9,7 +9,7 @@ import inloopio.math.indicator.Factor
  *
  * @author Caoyuan Deng
  */
-final class PROBMASSFunction(_baseSer: BaseTSer, var baseVar: TVar[Double], var weight: TVar[Double], var period: Factor, var nInterval: Factor) extends Function(_baseSer) {
+final class PROBMASSFunction(_baseSer: TBaseSer, var baseVar: TVar[Double], var weight: TVar[Double], var period: Factor, var nInterval: Factor) extends Function(_baseSer) {
 
   protected def probMass(idx: Int, baseVar: TVar[Double], period: Double, nInterval: Double): Array[Array[Double]] = {
     val begIdx = idx - period.intValue + 1

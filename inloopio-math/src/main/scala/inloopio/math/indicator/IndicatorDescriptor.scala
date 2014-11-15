@@ -2,7 +2,7 @@ package inloopio.math.indicator
 
 import inloopio.collection.ArrayList
 import inloopio.math.PersistenceManager
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TFreq
 import inloopio.math.timeseries.descriptor.Descriptor
 
@@ -81,7 +81,7 @@ class IndicatorDescriptor(_serviceClassName: => String, _freq: => TFreq, $factor
    */
   protected def createServiceInstance(args: Any*): Option[Indicator] = {
     //    args match {
-    //    case Seq(baseSerx: BaseTSer) =>
+    //    case Seq(baseSerx: TBaseSer) =>
     //      lookupServiceTemplate(classOf[Indicator], "Indicators") match {
     //        case Some(indx) =>
     //          // is this indicator from another symbol ?

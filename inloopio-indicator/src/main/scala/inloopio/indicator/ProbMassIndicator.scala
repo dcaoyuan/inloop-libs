@@ -1,13 +1,13 @@
 package inloopio.indicator
 
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
 
 /**
  *
  * @author Caoyuan Deng
  */
-class ProbMassIndicator(_baseSer: BaseTSer) extends SpotIndicator(_baseSer) {
+class ProbMassIndicator(_baseSer: TBaseSer) extends SpotIndicator(_baseSer) {
   sname = "Probability Mass"
   lname = "Probability Mass"
   isOverlapping = true

@@ -4,9 +4,9 @@ package inloopio.indicator
  *
  * @author Caoyuan Deng
  */
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 
-class VOLIndicator(_baseSer: BaseTSer) extends Indicator(_baseSer) {
+class VOLIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) {
   sname = "VOL"
   lname = "Volume"
 

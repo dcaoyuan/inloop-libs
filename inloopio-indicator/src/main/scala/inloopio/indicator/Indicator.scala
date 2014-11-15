@@ -6,13 +6,13 @@ import inloopio.math.indicator.Factor
 import inloopio.math.indicator.Function
 import inloopio.math.indicator.IndicatorHelper
 import inloopio.math.signal.Side
-import inloopio.math.timeseries.{ DefaultTSer, TVar, BaseTSer, ThingSer }
+import inloopio.math.timeseries.{ DefaultTSer, TVar, TBaseSer, ThingSer }
 import scala.concurrent.duration._
 
 /**
  * @param base series to compute this, not null.
  */
-abstract class Indicator(val baseSer: BaseTSer, _factors: Factor*) extends DefaultTSer(baseSer.freq)
+abstract class Indicator(val baseSer: TBaseSer, _factors: Factor*) extends DefaultTSer(baseSer.freq)
     with inloopio.math.indicator.Indicator
     with IndicatorHelper {
 

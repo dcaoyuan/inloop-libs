@@ -1,13 +1,13 @@
 package inloopio.indicator.function
 
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.BaseTSer
+import inloopio.math.timeseries.TBaseSer
 
 /**
  *
  * @author Caoyuan Deng
  */
-class DMFunction(_baseSer: BaseTSer) extends Function(_baseSer) {
+class DMFunction(_baseSer: TBaseSer) extends Function(_baseSer) {
 
   val _dmPlus = TVar[Double]()
   val _dmMinus = TVar[Double]()
