@@ -33,7 +33,11 @@ trait Reactor extends Publishablity {
    */
   protected val reactions: Reactions = new Reactions()
 
-  private val underlyingActor = context.actorOf(Reactor.UnderlyingActor.props(reactions))
+  private lazy val underlyingActor = {
+    val ref = context.actorOf(Reactor.UnderlyingActor.props(reactions))
+    context watch ref
+    ref
+  }
 
   /**
    * send message via undeylyingActor.
