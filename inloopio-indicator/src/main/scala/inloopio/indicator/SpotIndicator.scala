@@ -2,9 +2,9 @@ package inloopio.indicator
 
 import inloopio.collection.ArrayList
 import inloopio.math.timeseries.Null
-import inloopio.math.timeseries.OhlcType
 import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TVar
+import inloopio.math.timeseries.TVarKind
 import inloopio.math.indicator.Plot
 import scala.collection.immutable
 import scala.reflect.ClassTag
@@ -44,14 +44,13 @@ abstract class SpotIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) wit
   protected def computeSpot(time: Long, baseIdx: Int)
 
   object STVar {
-    def apply[V: ClassTag](): TVar[V] = new SpotTVar[V]("", true, OhlcType.Close, Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new SpotTVar[V](name, true, OhlcType.Close, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new SpotTVar[V](name, true, OhlcType.Close, plot)
-    def apply[V: ClassTag](name: String, ohlcType: OhlcType, plot: Plot): TVar[V] = new SpotTVar[V](name, true, ohlcType, plot)
-    def apply[V: ClassTag](name: String, isInstant: Boolean, ohlcType: OhlcType, plot: Plot): TVar[V] = new SpotTVar[V](name, isInstant, ohlcType, plot)
+    def apply[V: ClassTag](): TVar[V] = new SpotTVar[V]("", TVarKind.Close, Plot.None)
+    def apply[V: ClassTag](name: String): TVar[V] = new SpotTVar[V](name, TVarKind.Close, Plot.None)
+    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new SpotTVar[V](name, TVarKind.Close, plot)
+    def apply[V: ClassTag](name: String, kind: TVarKind, plot: Plot): TVar[V] = new SpotTVar[V](name, kind, plot)
   }
 
-  final protected class SpotTVar[V: ClassTag](_name: String, _isInstant: Boolean, _ohlcType: OhlcType, _plot: Plot) extends AbstractInnerTVar[V](_name, _isInstant, _ohlcType, _plot) {
+  final protected class SpotTVar[V: ClassTag](_name: String, _kind: TVarKind, _plot: Plot) extends AbstractInnerTVar[V](_name, _kind, _plot) {
 
     private var timeToValue = immutable.TreeMap[Long, V]() // must sort by time
 

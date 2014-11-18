@@ -194,7 +194,8 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
         checkingCursor = tlog.nextCursor(checkingCursor)
       }
 
-      assert(timestamps.size == holders.size,
+      assert(
+        timestamps.size == holders.size,
         "Timestamps size=" + timestamps.size + " vs items size=" + holders.size +
           ", checkedCursor=" + tsLogCheckedCursor +
           ", log=" + tlog)
@@ -373,14 +374,13 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
   override def hashCode: Int = _hashCode
 
   object TVar {
-    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", true, OhlcType.Close, Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, true, OhlcType.Close, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, true, OhlcType.Close, plot)
-    def apply[V: ClassTag](name: String, ohlcType: OhlcType, plot: Plot): TVar[V] = new InnerTVar[V](name, true, ohlcType, plot)
-    def apply[V: ClassTag](name: String, isInstantVar: Boolean, ohlcType: OhlcType, plot: Plot): TVar[V] = new InnerTVar[V](name, isInstantVar, ohlcType, plot)
+    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", TVarKind.Close, Plot.None)
+    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, TVarKind.Close, Plot.None)
+    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, TVarKind.Close, plot)
+    def apply[V: ClassTag](name: String, kind: TVarKind, plot: Plot): TVar[V] = new InnerTVar[V](name, kind, plot)
   }
 
-  final protected class InnerTVar[V: ClassTag](_name: String, _isInstantVar: Boolean, _ohlcType: OhlcType, _plot: Plot) extends AbstractInnerTVar[V](_name, _isInstantVar, _ohlcType, _plot) {
+  final protected class InnerTVar[V: ClassTag](_name: String, _kind: TVarKind, _plot: Plot) extends AbstractInnerTVar[V](_name, _kind, _plot) {
 
     private var _values = new ArrayList[V](INIT_CAPACITY)
     def values = _values
@@ -510,7 +510,7 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * operation on values, including add, delete actions will be consistant by
    * cooperating with DefaultSer.
    */
-  abstract class AbstractInnerTVar[V: ClassTag](var name: String, val isInstantVar: Boolean, val ohlcType: OhlcType, val plot: Plot) extends TVar[V] {
+  abstract class AbstractInnerTVar[V: ClassTag](var name: String, val kind: TVarKind, val plot: Plot) extends TVar[V] {
 
     addVar(this)
 

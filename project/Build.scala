@@ -19,7 +19,7 @@ object Build extends sbt.Build {
     .settings(formatSettings: _*)
     //.settings(releaseSettings: _*)
     .settings(bintrayPublishSettings ++ sbtBintraySettings: _*)
-    .settings(libraryDependencies ++= Dependencies.all)
+    .settings(libraryDependencies ++= (Dependencies.all ++ Seq("org.scala-lang" % "scala-reflect" % scalaVersion.value)))
 
   lazy val inloopio_math = Project("inloopio-math", file("inloopio-math"))
     .dependsOn(inloopio_util)

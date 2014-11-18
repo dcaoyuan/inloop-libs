@@ -284,6 +284,7 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq = TFreq.DAILY) extends Default
     def toOnOccurredMode {
       _isOnCalendarMode = false
     }
+
     try {
       readLock.lock
 

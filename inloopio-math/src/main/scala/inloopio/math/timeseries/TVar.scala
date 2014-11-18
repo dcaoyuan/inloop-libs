@@ -3,6 +3,7 @@ package inloopio.math.timeseries
 import inloopio.math.indicator.Plottable
 import inloopio.collection.ArrayList
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 
 /**
  * A horizontal view of Ser. It's a reference of one of the field vars.
@@ -10,7 +11,16 @@ import scala.reflect.ClassTag
  *
  * @author Caoyuan Deng
  */
-abstract class TVar[V: ClassTag] extends Plottable {
+sealed trait TVarKind
+object TVarKind {
+  case object Open extends TVarKind
+  case object High extends TVarKind
+  case object Low extends TVarKind
+  case object Close extends TVarKind
+  case object Accumlate extends TVarKind
+}
+
+abstract class TVar[V](implicit val classTag: ClassTag[V]) extends Plottable {
   private val nullVal = Null.value[V]
 
   def name: String
@@ -21,9 +31,9 @@ abstract class TVar[V: ClassTag] extends Plottable {
   /**
    * @return Is it an instant variable if true, or an accumulate variable if false.
    */
-  def isInstantVar: Boolean
-  def isAccumulateVar: Boolean = !isInstantVar
-  def ohlcType: OhlcType
+  def isInstant = !isAccumulate
+  def isAccumulate = kind == TVarKind.Accumlate
+  def kind: TVarKind
 
   /**
    * Append or insert value at time
@@ -61,6 +71,8 @@ abstract class TVar[V: ClassTag] extends Plottable {
         "idx=" + idx + ", value size=" + values.size + ", timestamps size=" + timestamps.size)
     }
   }
+  def updateByCasting(idx: Int, value: Any) = update(idx, value.asInstanceOf[V])
+  def updateByCasting(time: Long, value: Any) = update(time, value.asInstanceOf[V])
 
   final def putNull(time: Long): Boolean = put(time, nullVal)
   final def putNull(idx: Int): Boolean = put(idx, nullVal)

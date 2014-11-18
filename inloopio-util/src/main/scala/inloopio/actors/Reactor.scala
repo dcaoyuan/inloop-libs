@@ -15,7 +15,8 @@ import scala.ref.WeakReference
 
 /**
  * A Reactor is not an actor, but has an underlying actor.
- * The Reactor should be enclosed in an actor, i.e. implement context and log
+ * A Reactor is best to be enclosed in an actor, so share the implemented context.
+ *
  * @author Caoyuan Deng
  */
 trait Reactor extends Publishablity {
