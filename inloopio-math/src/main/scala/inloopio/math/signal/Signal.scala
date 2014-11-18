@@ -2,8 +2,8 @@ package inloopio.math.signal
 
 import akka.actor.Actor
 import akka.actor.ActorLogging
+import inloopio.actors.Publisher
 import inloopio.math.indicator.SignalIndicator
-import inloopio.util.actors.Publishable
 import java.awt.Color
 
 /**
@@ -97,9 +97,9 @@ class Signal(val time: Long, _kind: Kind, val id: Int = 0, val text: String = nu
   }
 }
 
-object Signal extends Actor with ActorLogging with Publishable {
+object Signal extends Actor with ActorLogging with Publisher {
 
-  def receive = publishableBehavior
+  def receive = publisherBehavior
 
   // --- simple test
   def main(args: Array[String]) {

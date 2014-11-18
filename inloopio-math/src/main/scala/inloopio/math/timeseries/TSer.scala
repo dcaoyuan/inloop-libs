@@ -1,11 +1,7 @@
 package inloopio.math.timeseries
 
-import akka.actor.Actor
+import inloopio.actors.Reactor
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import akka.actor.ActorLogging
-import akka.actor.ActorRef
-import inloopio.util.actors.AskView
-import inloopio.util.actors.Publishable
 import scala.collection.mutable
 
 /**
@@ -20,15 +16,11 @@ final case class AddAll[V <: TVal](values: Array[V])
  * trait TBaseSer extends TSer, DefaultTBaseSer extends both TSer and TBaseSer, so
  * keep TSer as a trait instead of abstract class.
  */
-trait TSer extends Actor with ActorLogging with Publishable {
+trait TSer extends Reactor {
 
   private val readWriteLock = new ReentrantReadWriteLock
   protected val readLock = readWriteLock.readLock
   protected val writeLock = readWriteLock.writeLock
-
-  def askViewBehavior: Actor.Receive = {
-    case AskView => sender() ! this
-  }
 
   private var _isLoaded: Boolean = false
   def isLoaded = _isLoaded
@@ -166,7 +158,7 @@ trait TSer extends Actor with ActorLogging with Publishable {
 }
 
 trait TSerEvent {
-  def source: ActorRef
+  def source: TSer
   def symbol: String
   def fromTime: Long
   def toTime: Long
@@ -177,56 +169,56 @@ object TSerEvent {
   type Callback = () => Any
 
   final case class Refresh(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
   final case class Loaded(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
   final case class Updated(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
   final case class Closed(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
   final case class Computed(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
   final case class Cleared(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
   final case class ToBeSet(
-    source: ActorRef,
+    source: TSer,
     symbol: String,
     fromTime: Long,
     toTime: Long,
     message: String = null,
     callback: Callback = null) extends TSerEvent
 
-  def unapply(e: TSerEvent): Option[(ActorRef, String, Long, Long, String, Callback)] = {
+  def unapply(e: TSerEvent): Option[(TSer, String, Long, Long, String, Callback)] = {
     Some((e.source, e.symbol, e.fromTime, e.toTime, e.message, e.callback))
   }
 }

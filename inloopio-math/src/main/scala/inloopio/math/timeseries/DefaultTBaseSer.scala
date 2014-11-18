@@ -4,21 +4,18 @@ package inloopio.math.timeseries
  *
  * @author Caoyuan Deng
  */
-import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
 import inloopio.math.indicator.Factor
 import inloopio.math.indicator.Function
 import inloopio.math.indicator.Id
 import inloopio.math.indicator.Indicator
-import inloopio.util.actors.AskView
+import inloopio.util.Reflect
 import java.util.concurrent.ConcurrentHashMap
-import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
-class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) with TBaseSer {
-  def this() = this(null, TFreq.DAILY)
+class DefaultTBaseSer(_thing: Thing, _freq: TFreq = TFreq.DAILY) extends DefaultTSer(_freq) with TBaseSer {
 
   private val timeout = Timeout(5.seconds)
   private var _isOnCalendarMode = false
@@ -27,18 +24,17 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
 
   attach(TStamps(INIT_CAPACITY))
 
+  def context = thing.context
+
   def function[T <: Function: ClassTag](functionClass: Class[T], args: Any*): T = {
-    val id = Id(functionClass, this, args)
+    val id = Id(functionClass, this, args: _*)
     idToFunction.get(id) match {
       case null =>
         /** if got none from idToFunction, try to create new one */
         try {
-          val props = Props(functionClass, this, args)
-          val ref = context.actorOf(props)
-          val f = (ref ? AskView)(timeout).mapTo[T]
-          val instance = Await.result(f, timeout.duration)
-          idToFunction.putIfAbsent(id, instance)
-          instance
+          val function = Reflect.instantiate(functionClass, this :: args.toList)
+          idToFunction.putIfAbsent(id, function)
+          function
         } catch {
           case ex: Throwable => log.error(ex, ex.getMessage); null.asInstanceOf[T]
         }
@@ -46,19 +42,18 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
     }
   }
 
-  def indicator[T <: Indicator: ClassTag](indicatorClass: Class[T], args: Factor*): T = {
-    val id = Id(indicatorClass, this, args)
+  def indicator[T <: Indicator: ClassTag](indicatorClass: Class[T], factors: Factor*): T = {
+    val id = Id(indicatorClass, this, factors)
     idToIndicator.get(id) match {
       case null =>
         /** if got none from idToFunction, try to create new one */
         try {
-          val props = Props(indicatorClass, this, args)
-          val ref = context.actorOf(props)
-          val f = (ref ? AskView)(timeout).mapTo[T]
-          val instance = Await.result(f, timeout.duration)
-          idToIndicator.putIfAbsent(id, instance)
-          instance.computeFrom(0)
-          instance
+          val indicator = Reflect.instantiate(indicatorClass, this :: factors.toList)
+          //indicator.factors = factors.toArray // set factors first to avoid multiple computeFrom(0)
+          /** don't forget to call set(baseSer) immediatley */
+          idToIndicator.putIfAbsent(id, indicator)
+          indicator.computeFrom(0)
+          indicator
         } catch {
           case ex: Throwable => log.error(ex, ex.getMessage); null.asInstanceOf[T]
         }
@@ -69,24 +64,24 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
   def thing = _thing
 
   /*-
-   * !NOTICE
-   * This should be the only place to create an Item from outside, because it's
-   * a bit complex to finish an item creating procedure, the procedure contains
-   * at least 3 steps:
-   * 1. create a clear holder, which with clear = true, and idx to be set
-   *    later by holders;
-   * 2. add the time to timestamps properly.
-   * @see #internal_addClearItemAndNullVarValuesToList_And_Filltimestamps__InTimeOrder(long, SerItem)
-   * 3. add null value to vars at the proper idx.
-   * @see #internal_addTime_addClearItem_addNullVarValues()
-   *
-   * So we do not try to provide other public methods such as addItem() that can
-   * add item from outside, you should use this method to create a new (a clear)
-   * item and return it, or just clear it, if it has be there.
-   * And that why define some motheds signature begin with internal_, becuase
-   * you'd better never think to open these methods to protected or public.
-   * @return Returns the index of time.
-   */
+ * !NOTICE
+ * This should be the only place to create an Item from outside, because it's
+ * a bit complex to finish an item creating procedure, the procedure contains
+ * at least 3 steps:
+ * 1. create a clear holder, which with clear = true, and idx to be set
+ *    later by holders;
+ * 2. add the time to timestamps properly.
+ * @see #internal_addClearItemAndNullVarValuesToList_And_Filltimestamps__InTimeOrder(long, SerItem)
+ * 3. add null value to vars at the proper idx.
+ * @see #internal_addTime_addClearItem_addNullVarValues()
+ *
+ * So we do not try to provide other public methods such as addItem() that can
+ * add item from outside, you should use this method to create a new (a clear)
+ * item and return it, or just clear it, if it has be there.
+ * And that why define some motheds signature begin with internal_, becuase
+ * you'd better never think to open these methods to protected or public.
+ * @return Returns the index of time.
+ */
   def createOrReset(time: Long) {
     try {
       writeLock.lock
@@ -207,7 +202,8 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
 
         size - 1
       } else {
-        assert(false,
+        assert(
+          false,
           "As it's an adding action, we should not reach here! " +
             "Check your code, you are probably from createOrReset(long), " +
             "Does timestamps.indexOfOccurredTime(itemTime) = " + timestamps.indexOfOccurredTime(time) +
@@ -250,7 +246,7 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
           toTime = math.max(toTime, time)
         } else {
           // @todo why will  happen? seems form loadFromPersistence
-          log.warning("Value of i=" + i + " is null")
+          log.warning("Value of i={} is null", i)
         }
 
         // shoudReverse: the recent quote's index is more in quotes, thus the order in timePositions[] is opposed to quotes
@@ -261,7 +257,7 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
           i += 1
       }
 
-      publish(TSerEvent.Updated(self, shortName, frTime, toTime))
+      publish(TSerEvent.Updated(this, shortName, frTime, toTime))
 
     } finally {
       writeLock.unlock
@@ -272,12 +268,8 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
   }
 
   def isOnCalendarMode = _isOnCalendarMode
-  def toOnCalendarMode {
-    _isOnCalendarMode = true
-  }
-  def toOnOccurredMode {
-    _isOnCalendarMode = false
-  }
+  def toOnCalendarMode { _isOnCalendarMode = true }
+  def toOnOccurredMode { _isOnCalendarMode = false }
 
   def indexOfTime(time: Long): Int = activeTimestamps.indexOfOccurredTime(time)
   def timeOfIndex(idx: Int): Long = activeTimestamps(idx)
@@ -289,6 +281,9 @@ class DefaultTBaseSer(_thing: Thing, _freq: TFreq) extends DefaultTSer(_freq) wi
   override def size: Int = activeTimestamps.sizeOf(freq)
 
   private def activeTimestamps: TStamps = {
+    def toOnOccurredMode {
+      _isOnCalendarMode = false
+    }
     try {
       readLock.lock
 

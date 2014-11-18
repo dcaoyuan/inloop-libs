@@ -1,4 +1,4 @@
-package inloopio.util.actors
+package inloopio.actors
 
 import scala.collection.mutable
 import scala.ref._
@@ -110,3 +110,4 @@ abstract class RefSet[A <: AnyRef] extends mutable.Set[A] with SingleRefCollecti
 
   protected[this] def removeReference(ref: Reference[A]) { underlying -= ref }
 }
+

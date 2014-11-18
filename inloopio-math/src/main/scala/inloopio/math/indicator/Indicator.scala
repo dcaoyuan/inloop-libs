@@ -9,6 +9,21 @@ import inloopio.math.timeseries.TSer
  *
  * @author Caoyuan Deng
  */
+object Indicator {
+
+  private val FAC_DECIMAL_FORMAT = new DecimalFormat("0.###")
+
+  def displayName(ser: TSer): String = ser match {
+    case x: Indicator => displayName(ser.shortName, x.factors)
+    case _            => ser.shortName
+  }
+
+  def displayName(name: String, factors: Array[Factor]): String = {
+    if (factors.length == 0) name
+    else factors map { x => FAC_DECIMAL_FORMAT.format(x.value) } mkString (name + "(", ",", ")")
+  }
+}
+
 trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
 
   protected val Plot = inloopio.math.indicator.Plot
@@ -20,7 +35,7 @@ trait Indicator extends TSer with WithFactors with Ordered[Indicator] {
       if (baseSer != null) computeFrom(0)
   }
 
-  def receive = publishableBehavior orElse indicatorBehavior
+  reactions += indicatorBehavior
 
   def baseSer: TBaseSer
 
@@ -139,21 +154,6 @@ trait WithFactors { _: Indicator =>
 
     def apply(name: String, value: Double, step: Double, minValue: Double, maxValue: Double) =
       new InnerFactor(name, value, step, minValue, maxValue)
-  }
-}
-
-object Indicator {
-
-  private val FAC_DECIMAL_FORMAT = new DecimalFormat("0.###")
-
-  def displayName(ser: TSer): String = ser match {
-    case x: Indicator => displayName(ser.shortName, x.factors)
-    case _            => ser.shortName
-  }
-
-  def displayName(name: String, factors: Array[Factor]): String = {
-    if (factors.length == 0) name
-    else factors map { x => FAC_DECIMAL_FORMAT.format(x.value) } mkString (name + "(", ",", ")")
   }
 }
 

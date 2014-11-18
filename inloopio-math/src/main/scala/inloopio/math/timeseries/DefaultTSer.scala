@@ -23,9 +23,9 @@ import scala.reflect.ClassTag
  *
  * @author Caoyuan Deng
  */
-class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
-  protected val INIT_CAPACITY = 100
+abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
 
+  protected val INIT_CAPACITY = 100
   /**
    * The length of ONE_MIN is 15000/240 = 62.5 days, about 3 months
    * The length of DAILY is 15000/ 250 = 60 years.
@@ -61,8 +61,6 @@ class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
   protected var lname = ""
   /** Short description */
   protected var sname = ""
-
-  def receive = publishableBehavior orElse askViewBehavior
 
   def timestamps: TStamps = _timestamps
   def attach(timestamps: TStamps) {
@@ -232,7 +230,7 @@ class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
       //timestamps.readLock.unlock
     }
 
-    publish(TSerEvent.Cleared(self, shortName, fromTime, Long.MaxValue))
+    publish(TSerEvent.Cleared(this, shortName, fromTime, Long.MaxValue))
   }
 
   def indexOfOccurredTime(time: Long): Int = {

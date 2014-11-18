@@ -6,8 +6,8 @@ import java.util.TimeZone
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.Props
+import inloopio.actors.Publisher
 import inloopio.math.timeseries.TVal
-import inloopio.util.actors.Publishable
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.concurrent.duration._
@@ -18,7 +18,7 @@ import scala.concurrent.duration._
  * @param [V] data storege type
  * @author Caoyuan Deng
  */
-abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor with ActorLogging with Publishable {
+abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor with ActorLogging with Publisher {
 
   type C <: DataContract[_]
 
@@ -64,7 +64,7 @@ abstract class DataServer[V: ClassTag] extends Ordered[DataServer[V]] with Actor
   // --- a proxy actor for HeartBeat event etc, which will detect the speed of
   // refreshing requests, if consumer can not catch up the producer, will drop
   // some requests.
-  def receive = publishableBehavior orElse {
+  def receive = publisherBehavior orElse {
     case Heartbeat(interval) =>
       if (isRefreshable && flowCount < 5) {
         // refresh from loadedTime for subscribedContracts

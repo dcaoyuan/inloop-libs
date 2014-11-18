@@ -185,7 +185,7 @@ abstract class SignalIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) w
       }
     }
 
-    publish(TSerEvent.Computed(self, null, time, time, null, null))
+    publish(TSerEvent.Computed(this, null, time, time, null, null))
   }
 
   protected def addSignals(signals: Array[Signal]) {
@@ -211,7 +211,7 @@ abstract class SignalIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) w
     }
 
     if (signals.length > 0) {
-      publish(TSerEvent.Computed(self, null, frTime, toTime, null, null))
+      publish(TSerEvent.Computed(this, null, frTime, toTime, null, null))
     }
   }
 

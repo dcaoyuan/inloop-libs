@@ -1,7 +1,7 @@
 package inloopio.math.indicator
 
 import akka.actor.Actor
-import akka.actor.ActorRef
+import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TSerEvent
 
 /**
@@ -27,7 +27,7 @@ trait IndicatorHelper { me: Indicator =>
   // remember event's callback to be forwarded in postCompute()
   private var baseSerEventCallBack: TSerEvent.Callback = _
 
-  protected def createBaseSerBehavior(baseSer: ActorRef): Actor.Receive = {
+  protected def createBaseSerBehavior(baseSer: TBaseSer): Actor.Receive = {
     /**
      * The ser is a result computed from baseSer, so should follow the baseSeries' data changing:
      * 1. In case of series is the same as baseSeries, should respond to
@@ -114,7 +114,8 @@ trait IndicatorHelper { me: Indicator =>
 
   def postComputeFrom {
     // construct resultSer's change event, forward baseSerEventCallBack
-    me.publish(TSerEvent.Computed(self,
+    me.publish(TSerEvent.Computed(
+      this,
       null,
       fromTime,
       me.computedTime,

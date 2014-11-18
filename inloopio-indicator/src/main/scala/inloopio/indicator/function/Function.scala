@@ -19,9 +19,9 @@ object Function {
   }
 }
 
-import Function._
-abstract class Function(val baseSer: TBaseSer, args: Any*) extends DefaultTSer(baseSer.freq)
-    with inloopio.math.indicator.Function {
+abstract class Function(val baseSer: TBaseSer, args: Any*) extends DefaultTSer(baseSer.freq) with inloopio.math.indicator.Function {
+
+  def context = baseSer.context
 
   /**
    * Use computing session to avoid redundant computation on same idx of same
@@ -46,8 +46,7 @@ abstract class Function(val baseSer: TBaseSer, args: Any*) extends DefaultTSer(b
   attach(baseSer.timestamps)
   initPredefinedVarsOfBaseSer
 
-  def set(args: Any*) {
-  }
+  def set(args: Any*) {}
 
   /** override this method to define your own pre-defined vars if necessary */
   protected def initPredefinedVarsOfBaseSer {

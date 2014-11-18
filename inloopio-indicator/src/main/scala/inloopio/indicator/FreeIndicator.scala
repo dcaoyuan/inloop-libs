@@ -11,7 +11,7 @@ import inloopio.math.timeseries.Thing
 class FreeIndicator(val baseSer: TBaseSer, _thing: Thing, _freq: TFreq) extends DefaultTBaseSer(_thing, _freq)
     with inloopio.math.indicator.Indicator {
 
-  override def receive = super.receive orElse indicatorBehavior
+  reactions += indicatorBehavior
 
   private var _identifier: Option[String] = None
   def identifier = _identifier

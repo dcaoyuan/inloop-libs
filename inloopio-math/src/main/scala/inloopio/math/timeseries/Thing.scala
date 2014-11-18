@@ -1,15 +1,14 @@
 package inloopio.math.timeseries
 
 import akka.actor.Actor
-import akka.actor.ActorRef
 import inloopio.math.timeseries.descriptor.Content
-import inloopio.util.actors.Publishable
+import inloopio.actors.Publisher
 
 /**
  *
  * @author Caoyuan Deng
  */
-trait Thing extends Publishable { _: Actor =>
+trait Thing extends Actor with Publisher { _: Actor =>
 
   def identifier: String
 
@@ -18,7 +17,7 @@ trait Thing extends Publishable { _: Actor =>
   def description: String
   def description_=(description: String)
 
-  def serOf(freq: TFreq): Option[ActorRef]
+  def serOf(freq: TFreq): Option[TSer]
 
   /**
    * The content of each symbol should be got automatailly from PersistenceManager.restoreContent

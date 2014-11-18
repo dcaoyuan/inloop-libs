@@ -7,9 +7,8 @@ import inloopio.math.timeseries.TBaseSer
 //import inloopio.securities.InfoPointSer
 //import java.util.logging.Logger
 
-
 class InfoPointIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) {
-  //  private val log = Logger.getLogger(this.getClass.getName)
+
   //
   //  sname = "INFO"
   //  lname = "INFO"

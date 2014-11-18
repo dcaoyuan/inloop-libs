@@ -11,7 +11,7 @@ import inloopio.math.timeseries.TSerEvent
 import inloopio.math.timeseries.Thing
 import inloopio.util
 import inloopio.util.ValidTime
-import inloopio.util.actors.Publishable
+import inloopio.actors.Publisher
 import java.util.concurrent.ConcurrentHashMap
 import scala.reflect._
 import scala.concurrent.duration._
@@ -57,7 +57,7 @@ abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends Fr
   }
   // TODO listenTo(PanelIndicator)
 
-  override def receive = panelBehavior orElse super.receive
+  reactions += panelBehavior
 
   def addSecs(validTimes: collection.Seq[ValidTime[Thing]]) {
     validTimes foreach addThing
@@ -135,7 +135,7 @@ abstract class PanelIndicator[T <: Indicator: ClassTag](_freq: TFreq) extends Fr
   }
 }
 
-object PanelIndicator extends Actor with ActorLogging with Publishable {
+object PanelIndicator extends Actor with ActorLogging with Publisher {
 
   private val idToIndicator = new ConcurrentHashMap[Id[_ <: PanelIndicator[_ <: Indicator]], PanelIndicator[_ <: Indicator]](8, 0.9f, 1)
 
@@ -145,7 +145,7 @@ object PanelIndicator extends Actor with ActorLogging with Publishable {
   private var count = 0
   var indicatorCount = 0
 
-  def receive = publishableBehavior orElse {
+  def receive = publisherBehavior orElse {
     case PanelHeartbeat =>
       publish(PanelHeartbeat)
     //          count += 1

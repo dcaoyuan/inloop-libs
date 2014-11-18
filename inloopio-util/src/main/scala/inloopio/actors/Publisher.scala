@@ -1,4 +1,4 @@
-package inloopio.util.actors
+package inloopio.actors
 
 import akka.actor.Actor
 import akka.actor.ActorRef
@@ -14,7 +14,7 @@ import akka.routing.RoundRobinRoutingLogic
 import akka.routing.Router
 import scala.concurrent.duration._
 
-trait Publishable { _: Actor =>
+trait Publisher { _: Actor =>
 
   var queues = Set[ActorRef]() // ActorRef of queue 
   var groupToQueues: Map[Option[String], Set[ActorRefRoutee]] = Map.empty.withDefaultValue(Set.empty)
@@ -22,7 +22,7 @@ trait Publishable { _: Actor =>
   def log: LoggingAdapter
 
   val groupRouter = Router(
-    context.system.settings.config.getString("inloopio.publishable.routing-logic") match {
+    context.system.settings.config.getString("inloopio.publisher.routing-logic") match {
       case "random"             => RandomRoutingLogic()
       case "round-robin"        => RoundRobinRoutingLogic()
       case "consistent-hashing" => ConsistentHashingRoutingLogic(context.system)
@@ -32,7 +32,7 @@ trait Publishable { _: Actor =>
 
   def topic = self.path.name
 
-  def publishableBehavior: Receive = {
+  def publisherBehavior: Receive = {
     case x @ Subscribe(topic, group, queue) =>
       insertSubscription(group, queue)
       sender() ! SubscribeAck(x)

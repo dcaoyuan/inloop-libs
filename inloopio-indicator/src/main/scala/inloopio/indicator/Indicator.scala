@@ -3,7 +3,6 @@ package inloopio.indicator
 import akka.pattern.ask
 import inloopio.indicator.function._
 import inloopio.math.indicator.Factor
-import inloopio.math.indicator.Function
 import inloopio.math.indicator.IndicatorHelper
 import inloopio.math.signal.Side
 import inloopio.math.timeseries.{ DefaultTSer, TVar, TBaseSer, ThingSer }
@@ -16,7 +15,7 @@ abstract class Indicator(val baseSer: TBaseSer, _factors: Factor*) extends Defau
     with inloopio.math.indicator.Indicator
     with IndicatorHelper {
 
-  import Indicator._
+  def context = baseSer.context
 
   /**
    * @Note
@@ -38,14 +37,14 @@ abstract class Indicator(val baseSer: TBaseSer, _factors: Factor*) extends Defau
   // share same timestamps with baseSer, should be care of ReadWriteLock
   attach(baseSer.timestamps)
 
-  lazy val baseSerBehavior = createBaseSerBehavior(baseSer.self)
+  val baseSerBehavior = createBaseSerBehavior(baseSer)
 
   initPredefinedVarsOfBaseSer
   factors = _factors.toArray
 
-  // TODO listenTo(baseSer)
+  listenTo(baseSer)
 
-  override def receive = super.receive orElse baseSerBehavior
+  reactions += baseSerBehavior
 
   private var _identifier: Option[String] = None
   def identifier = _identifier
@@ -95,7 +94,7 @@ abstract class Indicator(val baseSer: TBaseSer, _factors: Factor*) extends Defau
    */
   def computeFrom(fromTime: Long) {
     if (baseSer != null) {
-      setSessionId
+      Indicator.setSessionId()
 
       try {
         timestamps.readLock.lock
@@ -194,6 +193,7 @@ abstract class Indicator(val baseSer: TBaseSer, _factors: Factor*) extends Defau
   }
 
   // ----- End of functions for test
+  import Indicator.sessionId
 
   final protected def sum(idx: Int, baseVar: TVar[_], period: Factor): Double = {
     baseSer.function(classOf[SUMFunction], baseVar, period).sum(sessionId, idx)
@@ -350,7 +350,7 @@ object Indicator {
   /** a static global session id */
   protected var sessionId: Long = _
 
-  protected def setSessionId {
+  protected def setSessionId() {
     sessionId += 1
   }
 }

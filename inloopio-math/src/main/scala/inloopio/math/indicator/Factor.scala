@@ -8,11 +8,12 @@ package inloopio.math.indicator
  * If you use Factor in indicator, please considerate AbstractIndicator#InnerFactor first
  * which will be added to Indicator's factors automatically when new it.
  */
-class Factor(var name: String,
-             var value: Double,
-             var step: Double = 1.0,
-             var minValue: Double = Double.MinValue,
-             var maxValue: Double = Double.MaxValue) extends Cloneable {
+class Factor(
+    var name: String,
+    var value: Double,
+    var step: Double = 1.0,
+    var minValue: Double = Double.MinValue,
+    var maxValue: Double = Double.MaxValue) extends Cloneable {
 
   @inline override final def equals(a: Any) = a match {
     case x: Factor => this.value == x.value
