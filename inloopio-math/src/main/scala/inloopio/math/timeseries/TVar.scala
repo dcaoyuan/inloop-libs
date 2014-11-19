@@ -11,16 +11,18 @@ import scala.reflect.runtime.universe._
  *
  * @author Caoyuan Deng
  */
-sealed trait TVarKind
-object TVarKind {
-  case object Open extends TVarKind
-  case object High extends TVarKind
-  case object Low extends TVarKind
-  case object Close extends TVarKind
-  case object Accumlate extends TVarKind
+object TVar {
+  sealed trait Kind
+  object Kind {
+    case object Open extends Kind
+    case object High extends Kind
+    case object Low extends Kind
+    case object Close extends Kind
+    case object Accumlate extends Kind
+  }
 }
 
-abstract class TVar[V](implicit val classTag: ClassTag[V]) extends Plottable {
+abstract class TVar[V: ClassTag] extends Plottable {
   private val nullVal = Null.value[V]
 
   def name: String
@@ -32,8 +34,8 @@ abstract class TVar[V](implicit val classTag: ClassTag[V]) extends Plottable {
    * @return Is it an instant variable if true, or an accumulate variable if false.
    */
   def isInstant = !isAccumulate
-  def isAccumulate = kind == TVarKind.Accumlate
-  def kind: TVarKind
+  def isAccumulate = kind == TVar.Kind.Accumlate
+  def kind: TVar.Kind
 
   /**
    * Append or insert value at time

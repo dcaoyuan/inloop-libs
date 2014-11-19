@@ -374,13 +374,16 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
   override def hashCode: Int = _hashCode
 
   object TVar {
-    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", TVarKind.Close, Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, TVarKind.Close, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, TVarKind.Close, plot)
-    def apply[V: ClassTag](name: String, kind: TVarKind, plot: Plot): TVar[V] = new InnerTVar[V](name, kind, plot)
+    val Kind = inloopio.math.timeseries.TVar.Kind
+    type Kind = inloopio.math.timeseries.TVar.Kind
+
+    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", Kind.Close, Plot.None)
+    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, Kind.Close, Plot.None)
+    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, Kind.Close, plot)
+    def apply[V: ClassTag](name: String, kind: Kind, plot: Plot): TVar[V] = new InnerTVar[V](name, kind, plot)
   }
 
-  final protected class InnerTVar[V: ClassTag](_name: String, _kind: TVarKind, _plot: Plot) extends AbstractInnerTVar[V](_name, _kind, _plot) {
+  final protected class InnerTVar[V: ClassTag](_name: String, _kind: TVar.Kind, _plot: Plot) extends AbstractInnerTVar[V](_name, _kind, _plot) {
 
     private var _values = new ArrayList[V](INIT_CAPACITY)
     def values = _values
@@ -510,7 +513,7 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * operation on values, including add, delete actions will be consistant by
    * cooperating with DefaultSer.
    */
-  abstract class AbstractInnerTVar[V: ClassTag](var name: String, val kind: TVarKind, val plot: Plot) extends TVar[V] {
+  abstract class AbstractInnerTVar[V: ClassTag](var name: String, val kind: TVar.Kind, val plot: Plot) extends TVar[V] {
 
     addVar(this)
 

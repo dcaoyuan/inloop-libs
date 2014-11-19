@@ -10,9 +10,9 @@ import scala.collection.mutable.WeakHashMap
  *
  * @author Caoyuan Deng
  */
-class TSerCombiner(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) extends Reactor {
+class TSerMerger(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) extends Reactor {
 
-  TSerCombiner.strongRefHolders.put(tarSer, this)
+  TSerMerger.strongRefHolders.put(tarSer, this)
 
   def context = tarSer.context
 
@@ -62,8 +62,8 @@ class TSerCombiner(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) exten
             val svar = srcVars.next
             val tvar = tarVars.next
             svar.kind match {
-              case TVarKind.Accumlate => tvar.updateByCasting(time_i, tvar.double(time_i) + svar.double(time_i))
-              case _                  => tvar.updateByCasting(time_i, svar(time_i))
+              case TVar.Kind.Accumlate => tvar.updateByCasting(time_i, tvar.double(time_i) + svar.double(time_i))
+              case _                   => tvar.updateByCasting(time_i, svar(time_i))
             }
           }
 
@@ -73,11 +73,11 @@ class TSerCombiner(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) exten
             val svar = srcVars.next
             val tvar = tarVars.next
             svar.kind match {
-              case TVarKind.Accumlate => tvar.updateByCasting(time_i, tvar.double(time_i) + svar.double(time_i))
-              case TVarKind.Open      => // do nothing
-              case TVarKind.High      => tvar.updateByCasting(time_i, math.max(tvar.double(time_i), svar.double(time_i)))
-              case TVarKind.Low       => tvar.updateByCasting(time_i, math.min(tvar.double(time_i), svar.double(time_i)))
-              case TVarKind.Close     => tvar.updateByCasting(time_i, svar.double(time_i))
+              case TVar.Kind.Accumlate => tvar.updateByCasting(time_i, tvar.double(time_i) + svar.double(time_i))
+              case TVar.Kind.High      => tvar.updateByCasting(time_i, math.max(tvar.double(time_i), svar.double(time_i)))
+              case TVar.Kind.Low       => tvar.updateByCasting(time_i, math.min(tvar.double(time_i), svar.double(time_i)))
+              case TVar.Kind.Close     => tvar.updateByCasting(time_i, svar.double(time_i))
+              case TVar.Kind.Open      => // do nothing
             }
           }
 
@@ -114,8 +114,8 @@ class TSerCombiner(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) exten
   def dispose {}
 }
 
-object TSerCombiner {
+object TSerMerger {
   // Holding strong reference to ser combiner etc, see @TSerCombiner
-  private val strongRefHolders = WeakHashMap[TSer, TSerCombiner]()
+  private val strongRefHolders = WeakHashMap[TSer, TSerMerger]()
 }
 

@@ -1,9 +1,9 @@
 package inloopio.math.indicator
 
-import java.text.DecimalFormat
 import akka.actor.Actor
 import inloopio.math.timeseries.TBaseSer
 import inloopio.math.timeseries.TSer
+import java.text.DecimalFormat
 
 /**
  *
@@ -19,8 +19,11 @@ object Indicator {
   }
 
   def displayName(name: String, factors: Array[Factor]): String = {
-    if (factors.length == 0) name
-    else factors map { x => FAC_DECIMAL_FORMAT.format(x.value) } mkString (name + "(", ",", ")")
+    if (factors.length == 0) {
+      name
+    } else {
+      factors map { x => FAC_DECIMAL_FORMAT.format(x.value) } mkString (name + "(", ",", ")")
+    }
   }
 }
 
@@ -141,19 +144,19 @@ trait WithFactors { _: Indicator =>
    * @see addFactor(..)
    * --------------------------------------------------------------------
    */
-  final protected class InnerFactor(name: => String, value: => Double, step: => Double, minValue: => Double, maxValue: => Double) extends Factor(name, value, step, minValue, maxValue) {
+  final protected class InnerFactor(
+      _name: String,
+      _value: Double,
+      _step: Double,
+      _minValue: Double,
+      _maxValue: Double) extends Factor(_name, _value, _step, _minValue, _maxValue) {
     addFactor(this)
   }
 
   object Factor {
-    def apply(name: String, value: Double) =
-      new InnerFactor(name, value, 1.0, Double.MinValue, Double.MaxValue)
-
-    def apply(name: String, value: Double, step: Double) =
-      new InnerFactor(name, value, step, Double.MinValue, Double.MaxValue)
-
-    def apply(name: String, value: Double, step: Double, minValue: Double, maxValue: Double) =
-      new InnerFactor(name, value, step, minValue, maxValue)
+    def apply(name: String, value: Double) = new InnerFactor(name, value, 1.0, Double.MinValue, Double.MaxValue)
+    def apply(name: String, value: Double, step: Double) = new InnerFactor(name, value, step, Double.MinValue, Double.MaxValue)
+    def apply(name: String, value: Double, step: Double, minValue: Double, maxValue: Double) = new InnerFactor(name, value, step, minValue, maxValue)
   }
 }
 
