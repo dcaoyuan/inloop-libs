@@ -1,5 +1,7 @@
 package inloopio.math.timeseries
 
+import java.util.Calendar
+
 /**
  * a value object with time field
  *
@@ -12,7 +14,7 @@ package inloopio.math.timeseries
  */
 class TVal extends Flag with Ordered[TVal] {
 
-  private var _time: Long = _
+  private var _time: Long = Long.MinValue
   def time = _time
   def time_=(time: Long) {
     this._time = time
@@ -37,5 +39,30 @@ class TVal extends Flag with Ordered[TVal] {
     } else {
       0
     }
+  }
+}
+
+class TValShift(freq: TFreq, cal: Calendar) {
+  private var unClosedTvals = List[TVal]()
+  private var tval: TVal = new TVal // tval.time is set to Long.MinVal default
+
+  def valOf(time: Long): TVal = {
+    val rounded = freq.round(time, cal)
+
+    if (tval.time != rounded) {
+      tval.closed_!
+      tval = openPeriod(rounded)
+    } else {
+      tval.unjustOpen_!
+    }
+    tval
+  }
+
+  private def openPeriod(rounded: Long): TVal = {
+    val newone = new TVal
+    newone.time = rounded
+    newone.unclosed_!
+    newone.justOpen_!
+    newone
   }
 }

@@ -1,106 +1,70 @@
 package inloopio.math.timeseries
 
-import inloopio.actors.Reactor
 import java.util.Calendar
 import java.util.TimeZone
-import scala.collection.mutable.WeakHashMap
 
 /**
- * @Note to get this Combiner react to srcSer, it should be held as strong ref by some instances
  *
  * @author Caoyuan Deng
  */
-class TSerMerger(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) extends Reactor {
+object TSerMerger {
 
-  TSerMerger.strongRefHolders.put(tarSer, this)
+  def merge(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone, fromTime: Long) {
+    val tvalShift = new TValShift(tarSer.freq, Calendar.getInstance(timeZone))
+    var prevTVal: TVal = null
 
-  def context = tarSer.context
-
-  reactions += {
-    case TSerEvent.Loaded(_, _, fromTime, _, _, _)   => compute(fromTime)
-    case TSerEvent.Computed(_, _, fromTime, _, _, _) => compute(fromTime)
-    case TSerEvent.Updated(_, _, fromTime, _, _, _)  => compute(fromTime)
-    case TSerEvent.Cleared(_, _, fromTime, _, _, _)  => compute(fromTime)
-  }
-  listenTo(srcSer)
-
-  private val cal = Calendar.getInstance(timeZone)
-  private var tval: TVal = _
-
-  def compute(fromTime: Long) {
     val cal = Calendar.getInstance(timeZone)
     cal.setTimeInMillis(fromTime)
     val roundedFromTime = tarSer.freq.round(fromTime, cal)
-    cal.setTimeInMillis(roundedFromTime)
     val srcFromIdx = math.max(0, srcSer.timestamps.indexOrNextIndexOfOccurredTime(roundedFromTime))
-
-    // --- begin combining
 
     val n = srcSer.size
     var i = srcFromIdx
-    while (i < n) {
-      val time_i = srcSer.timeOfIndex(i)
-      if (time_i >= roundedFromTime) {
-        val tval = tvalOf(time_i)
+    var srcTime = 0L
+    while (i < n && { srcTime = srcSer.timeOfIndex(i); srcTime >= roundedFromTime }) {
+      val tval = tvalShift.valOf(srcTime)
+      val tarTime = tval.time
 
-        val srcVars = srcSer.vars.iterator
-        val tarVars = tarSer.vars.iterator
-        /**
-         * @TIPS
-         * when combine, do adjust on source's value, then de adjust on combined quote data.
-         * this will prevent bad high, open, and low into combined quote data:
-         *
-         * During the combining period, an adjust may happened, but we only record last
-         * close_adj, the high, low, and open of the data before adjusted acutally may has
-         * different scale close_adj, so must do adjust with its own close_adj firstly. then
-         * use the last close_orj to de-adjust it.
-         */
-        if (tval.justOpen_?) {
-          tval.unjustOpen_!
+      val srcVars = srcSer.vars.iterator
+      val tarVars = tarSer.vars.iterator
 
-          while (srcVars.hasNext && tarVars.hasNext) {
-            val svar = srcVars.next
-            val tvar = tarVars.next
-            svar.kind match {
-              case TVar.Kind.Accumlate => tvar.updateByCasting(time_i, tvar.double(time_i) + svar.double(time_i))
-              case _                   => tvar.updateByCasting(time_i, svar(time_i))
-            }
-          }
+      if (tarSer.nonExists(tarTime)) {
+        tarSer.createOrReset(tarTime)
 
-        } else {
+        while (srcVars.hasNext && tarVars.hasNext) { // srcVars.size and order should be same as tarVars
+          val srcVar = srcVars.next
+          val tarVar = tarVars.next
 
-          while (srcVars.hasNext && tarVars.hasNext) {
-            val svar = srcVars.next
-            val tvar = tarVars.next
-            svar.kind match {
-              case TVar.Kind.Accumlate => tvar.updateByCasting(time_i, tvar.double(time_i) + svar.double(time_i))
-              case TVar.Kind.High      => tvar.updateByCasting(time_i, math.max(tvar.double(time_i), svar.double(time_i)))
-              case TVar.Kind.Low       => tvar.updateByCasting(time_i, math.min(tvar.double(time_i), svar.double(time_i)))
-              case TVar.Kind.Close     => tvar.updateByCasting(time_i, svar.double(time_i))
-              case TVar.Kind.Open      => // do nothing
-            }
-          }
-
+          tarVar.castingUpdate(tarTime, srcVar(srcTime))
         }
+
+      } else {
+
+        while (srcVars.hasNext && tarVars.hasNext) { // srcVars.size and order should be same as tarVars
+          val srcVar = srcVars.next
+          val tarVar = tarVars.next
+
+          tarVar.kind match {
+            case TVar.Kind.Open      => // do nothing
+            case TVar.Kind.High      => tarVar.castingUpdate(tarTime, math.max(tarVar.double(tarTime), srcVar.double(srcTime)))
+            case TVar.Kind.Low       => tarVar.castingUpdate(tarTime, math.min(tarVar.double(tarTime), srcVar.double(srcTime)))
+            case TVar.Kind.Close     => tarVar.castingUpdate(tarTime, srcVar(srcTime))
+            case TVar.Kind.Accumlate => tarVar.castingUpdate(tarTime, tarVar.double(tarTime) + srcVar.double(srcTime))
+          }
+        }
+
       }
+
+      if (tval.justOpen_?) {
+        tval.unjustOpen_!
+      }
+
+      if (prevTVal != null && prevTVal.closed_?) {
+        // prevTval closed
+      }
+
+      prevTVal = tval
       i += 1
-    }
-  }
-
-  def tvalOf(time: Long): TVal = {
-    val rounded = tarSer.freq.round(time, cal)
-    tval match {
-      case one: TVal if one.time == rounded =>
-        one
-      case prevOneOrNull => // interval changes or null
-        val newone = new TVal
-        newone.time = rounded
-        newone.unclosed_!
-        newone.justOpen_!
-        newone.fromMe_!
-
-        tval = newone
-        newone
     }
   }
 
@@ -111,11 +75,5 @@ class TSerMerger(srcSer: TBaseSer, tarSer: TBaseSer, timeZone: TimeZone) extends
     ((value - prevNorm) / prevNorm) * postNorm + postNorm
   }
 
-  def dispose {}
-}
-
-object TSerMerger {
-  // Holding strong reference to ser combiner etc, see @TSerCombiner
-  private val strongRefHolders = WeakHashMap[TSer, TSerMerger]()
 }
 

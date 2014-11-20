@@ -1,13 +1,14 @@
 package inloopio.actors
 
 import akka.actor.Actor.Receive
+import akka.event.LoggingAdapter
 import scala.collection.mutable.Buffer
 import scala.collection.mutable.ListBuffer
 
 /**
  * Used by Reactor to let clients register custom event reactions.
  */
-final class Reactions extends Receive {
+final class Reactions(log: () => LoggingAdapter) extends Receive {
   private val parts: Buffer[Receive] = new ListBuffer[Receive]
 
   def isDefinedAt(e: Any) = parts.exists(_ isDefinedAt e)
@@ -17,7 +18,9 @@ final class Reactions extends Receive {
       try {
         p(e)
       } catch {
-        case ex: Throwable => throw ReactionsException(e, ex)
+        case ex: Throwable =>
+          log().error(ex, "Exception on message {}", e)
+          throw ReactionsException(e, ex)
       }
     }
   }

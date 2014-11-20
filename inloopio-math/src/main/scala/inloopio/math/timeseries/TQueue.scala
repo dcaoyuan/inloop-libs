@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 /**
  * @author Caoyuan Deng
  */
-final class TimeQueue[V: ClassTag](freq: TFreq, limit: Int, onlyOneValue: Boolean = false) {
+final class TQueue[V: ClassTag](freq: TFreq, limit: Int, onlyOneValue: Boolean = false) {
 
   private val log = Logger.getLogger(getClass.getName)
   private val lastIdx = limit - 1
@@ -56,10 +56,10 @@ final class TimeQueue[V: ClassTag](freq: TFreq, limit: Int, onlyOneValue: Boolea
   }
 }
 
-object TimeQueue {
+object TQueue {
   // --- simple test
   def main(args: Array[String]) {
-    val tq = new TimeQueue[Int](TFreq.DAILY, 2)
+    val tq = new TQueue[Int](TFreq.DAILY, 2)
 
     val cal = Calendar.getInstance
     cal.setTimeInMillis(0)

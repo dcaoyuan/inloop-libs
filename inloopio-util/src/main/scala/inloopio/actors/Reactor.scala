@@ -2,13 +2,16 @@ package inloopio.actors
 
 import akka.actor.Actor
 import akka.actor.ActorContext
+import akka.actor.ActorRef
 import akka.actor.OneForOneStrategy
 import akka.actor.Props
 import akka.actor.SupervisorStrategy
 import akka.event.Logging
 import akka.event.LoggingAdapter
+import akka.util.Timeout
 import inloopio.actors.Reactor.StronglyReferenced
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.ref.Reference
 import scala.ref.WeakReference
@@ -27,12 +30,13 @@ trait Reactor extends Publishablity {
    */
   def context: ActorContext
 
-  protected lazy val log: LoggingAdapter = Logging(context.system, this.getClass)
+  private def createLog() = Logging(context.system, this.getClass)
+  protected lazy val log: LoggingAdapter = createLog()
 
   /**
    * All reactions of this reactor.
    */
-  protected val reactions: Reactions = new Reactions()
+  protected val reactions: Reactions = new Reactions(createLog)
 
   private lazy val underlyingActor = {
     val ref = context.actorOf(Reactor.UnderlyingActor.props(reactions))
@@ -43,8 +47,14 @@ trait Reactor extends Publishablity {
   /**
    * send message via undeylyingActor.
    */
-  def !(msg: Any) = {
-    underlyingActor ! msg
+  def !(message: Any): Unit = underlyingActor ! message
+  def tell(msg: Any, sender: ActorRef): Unit = underlyingActor.tell(msg, sender)
+  def forward(message: Any)(implicit context: ActorContext) = underlyingActor.forward(message)(context)
+
+  /** TODO **/
+  def ?(msg: Any)(implicit timeout: Timeout): Future[Any] = ask(msg)(timeout)
+  def ask(msg: Any)(implicit timeout: Timeout): Future[Any] = {
+    akka.pattern.ask(underlyingActor, msg)(timeout)
   }
 
   /**
@@ -71,7 +81,7 @@ object Reactor {
   final class UnderlyingActor(reactions: Reactions) extends Actor {
     override val supervisorStrategy =
       OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
-        case ReactionsException(msg, t) => SupervisorStrategy.Resume
+        case _: ReactionsException => SupervisorStrategy.Resume
       }
 
     def receive = {

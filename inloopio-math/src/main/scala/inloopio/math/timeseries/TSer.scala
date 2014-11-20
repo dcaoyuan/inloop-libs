@@ -1,5 +1,6 @@
 package inloopio.math.timeseries
 
+import akka.actor.ActorRef
 import inloopio.actors.Reactor
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import scala.collection.mutable
@@ -10,7 +11,9 @@ import scala.collection.mutable
  *
  * @author Caoyuan Deng
  */
-final case class AddAll[V <: TVal](values: Array[V])
+object TSer {
+  final case class Export(commander: ActorRef, freq: TFreq, fromTime: Long, toTime: Long, limit: Int = Int.MaxValue)
+}
 
 /**
  * trait TBaseSer extends TSer, DefaultTBaseSer extends both TSer and TBaseSer, so
@@ -21,6 +24,11 @@ trait TSer extends Reactor {
   private val readWriteLock = new ReentrantReadWriteLock
   protected val readLock = readWriteLock.readLock
   protected val writeLock = readWriteLock.writeLock
+
+  reactions += {
+    case TSer.Export(commander, _freq, fromTime, toTime, limit) if _freq == freq =>
+      commander ! export(fromTime, toTime, limit)
+  }
 
   private var _isLoaded: Boolean = false
   def isLoaded = _isLoaded

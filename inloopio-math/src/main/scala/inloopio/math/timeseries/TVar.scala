@@ -3,7 +3,6 @@ package inloopio.math.timeseries
 import inloopio.math.indicator.Plottable
 import inloopio.collection.ArrayList
 import scala.reflect.ClassTag
-import scala.reflect.runtime.universe._
 
 /**
  * A horizontal view of Ser. It's a reference of one of the field vars.
@@ -73,8 +72,8 @@ abstract class TVar[V: ClassTag] extends Plottable {
         "idx=" + idx + ", value size=" + values.size + ", timestamps size=" + timestamps.size)
     }
   }
-  def updateByCasting(idx: Int, value: Any) = update(idx, value.asInstanceOf[V])
-  def updateByCasting(time: Long, value: Any) = update(time, value.asInstanceOf[V])
+  def castingUpdate(idx: Int, value: Any) = update(idx, value.asInstanceOf[V])
+  def castingUpdate(time: Long, value: Any) = update(time, value.asInstanceOf[V])
 
   final def putNull(time: Long): Boolean = put(time, nullVal)
   final def putNull(idx: Int): Boolean = put(idx, nullVal)
@@ -172,9 +171,9 @@ abstract class TVar[V: ClassTag] extends Plottable {
       case x: Double => x
       case x: Number => x.doubleValue
       case x: AnyRef =>
-        assert(false, "Why you get here(TVar.double) ? " +
-          v + " Check your code and give me Double instead of double: " +
-          x.asInstanceOf[AnyRef].getClass.getCanonicalName)
+        //assert(false, "Why you arrived here(TVar.double) ? " +
+        //  v + " Check your code and give me Double instead of double or other types: " +
+        //  x.asInstanceOf[AnyRef].getClass.getCanonicalName)
         Null.Double
     }
   }
