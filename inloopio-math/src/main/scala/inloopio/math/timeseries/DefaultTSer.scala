@@ -41,8 +41,16 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * Each var element of array is a Var that contains a sequence of values for one field of SerItem.
    * @Note: Don't use scala's HashSet or HashMap to store Var, these classes seems won't get all of them stored
    */
-  val vars = new ArrayList[TVar[_]]()
+  private var _vars = List[TVar[_]]()
+  def vars = _vars
 
+  /**  Long description */
+  protected var lname = ""
+  /** Short description */
+  protected var sname = ""
+
+  private var tsLogCheckedCursor = 0
+  private var tsLogCheckedSize = 0
   /**
    * we implement occurred timestamps and items in density mode instead of spare
    * mode, to avoid itemOf(time) return null even in case of timestamps has been
@@ -53,15 +61,6 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * position <-> time <-> item
    */
   private var _timestamps: TStamps = _
-
-  private var tsLogCheckedCursor = 0
-  private var tsLogCheckedSize = 0
-
-  /**  Long description */
-  protected var lname = ""
-  /** Short description */
-  protected var sname = ""
-
   def timestamps: TStamps = _timestamps
   def attach(timestamps: TStamps) {
     _timestamps = timestamps
@@ -71,7 +70,7 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * used only by InnerVar's constructor and AbstractIndicator's functions
    */
   protected def addVar(v: TVar[_]) {
-    vars += v
+    _vars ::= v
   }
 
   /**
