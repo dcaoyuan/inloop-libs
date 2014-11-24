@@ -261,6 +261,7 @@ abstract class AbstractArrayList[A](
    *            `0 <= n <= length`.
    *
    *  override scala.collection.mutable.BufferLike.insert
+   *  https://issues.scala-lang.org/browse/SI-7268
    */
   @deprecated("Use insertAll(n: Int, elems: Traversable[A]) or insertOne(n: Int, elem: A), this method may cause ArrayStoreException.", "Scala 2.10.0")
   override def insert(n: Int, elems: A*) {

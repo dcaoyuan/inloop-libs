@@ -32,7 +32,7 @@ trait ResizableArray[A] extends IndexedSeq[A]
     with GenericTraversableTemplate[A, ResizableArray]
     with IndexedSeqOptimized[A, ResizableArray[A]] {
 
-  /** trait can not have type parameters like ResizableArray[A : ClassTag], so we have define a implicit val here */
+  /** trait can not have type parameters like ResizableArray[A : ClassTag], so we have define an implicit val here */
   protected implicit val m: ClassTag[A]
 
   protected val elementClass: Option[Class[A]]
