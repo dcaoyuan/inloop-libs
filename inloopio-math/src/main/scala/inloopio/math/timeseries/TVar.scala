@@ -40,12 +40,13 @@ abstract class TVar[V: ClassTag] extends Plottable {
    * Append or insert value at time
    */
   def put(time: Long, value: V): Boolean
-  def put(time: Long, fromHeadOrTail: Boolean, value: V): Boolean
+
+  /**
+   * Update valye at time
+   */
+  def update(time: Long, value: V)
 
   def apply(time: Long): V
-  def apply(time: Long, fromHeadOrTail: Boolean): V
-
-  def update(time: Long, value: V)
 
   def values: ArrayList[V]
 
@@ -152,9 +153,7 @@ abstract class TVar[V: ClassTag] extends Plottable {
       case x: Double => x.toFloat
       case x: Number => x.floatValue
       case x: AnyRef =>
-        assert(false, "Why you get here(TVar.float) ? " +
-          v + " Check your code and give me Float instead of float: " +
-          x.asInstanceOf[AnyRef].getClass.getCanonicalName)
+        assert(false, s"Why you arrived here: TVar.toFloat on ${x} with type: ${x.getClass.getCanonicalName} ?  Check your code and give me Float instead of float or other types")
         Null.Float
     }
   }
@@ -171,9 +170,7 @@ abstract class TVar[V: ClassTag] extends Plottable {
       case x: Double => x
       case x: Number => x.doubleValue
       case x: AnyRef =>
-        //assert(false, "Why you arrived here(TVar.double) ? " +
-        //  v + " Check your code and give me Double instead of double or other types: " +
-        //  x.asInstanceOf[AnyRef].getClass.getCanonicalName)
+        assert(false, s"Why you arrived here: TVar.toDouble on ${x} with type: ${x.getClass.getCanonicalName} ?  Check your code and give me Double instead of double or other types")
         Null.Double
     }
   }
@@ -205,10 +202,10 @@ abstract class TVar[V: ClassTag] extends Plottable {
     }
   }
 
+  private val _hashCode = System.identityHashCode(this)
   /**
    * All instances of TVar or extended classes use identityHashCode as hashCode
    */
-  private val _hashCode = System.identityHashCode(this)
   override def hashCode: Int = _hashCode
 
   override def toString = name

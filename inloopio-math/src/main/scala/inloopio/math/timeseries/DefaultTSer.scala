@@ -245,67 +245,6 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
     }
   }
 
-  def existsFromHead(time: Long): Boolean = {
-    try {
-      readLock.lock
-      val idx = indexOfOccurredTimeFromHead(time)
-      if (idx >= 0 && idx < holders.size) {
-        true
-      } else {
-        false
-      }
-    } finally {
-      readLock.unlock
-      //timestamps.readLock.unlock
-    }
-  }
-
-  def indexOfOccurredTimeFromHead(time: Long): Int = {
-    try {
-      readLock.lock
-      var i = 0
-      while (i < timestamps.size) {
-        if (timestamps(i) == time) return i
-        else if (timestamps(i) > time) return -1
-        i += 1
-      }
-
-      -1
-    } finally {
-      readLock.unlock
-    }
-  }
-
-  def existsFromTail(time: Long): Boolean = {
-    try {
-      readLock.lock
-      val idx = indexOfOccurredTimeFromTail(time)
-      if (idx >= 0 && idx < holders.size) {
-        true
-      } else {
-        false
-      }
-    } finally {
-      readLock.unlock
-    }
-  }
-
-  def indexOfOccurredTimeFromTail(time: Long): Int = {
-    try {
-      readLock.lock
-      var i = timestamps.size - 1
-      while (i >= 0) {
-        if (timestamps(i) == time) return i
-        else if (timestamps(i) < time) return -1
-        i -= 1
-      }
-
-      -1
-    } finally {
-      readLock.unlock
-    }
-  }
-
   def firstOccurredTime: Long = {
     try {
       readLock.lock
@@ -402,31 +341,8 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
       }
     }
 
-    /**
-     * @todo ? update or put
-     */
-    def put(time: Long, fromHeadOrTail: Boolean, value: V): Boolean = {
-      val idx = if (fromHeadOrTail) DefaultTSer.this.indexOfOccurredTimeFromHead(time) else DefaultTSer.this.indexOfOccurredTimeFromTail(time)
-      if (idx >= 0) {
-        if (idx == _values.size) {
-          _values += value
-        } else {
-          _values.insertOne(idx, value)
-        }
-        true
-      } else {
-        assert(false, "Fill timestamps first before put an element! " + ": " + "idx=" + idx + ", time=" + time)
-        false
-      }
-    }
-
     def apply(time: Long): V = {
       val idx = timestamps.indexOfOccurredTime(time)
-      _values(idx)
-    }
-
-    def apply(time: Long, fromHeadOrTail: Boolean): V = {
-      val idx = if (fromHeadOrTail) DefaultTSer.this.indexOfOccurredTimeFromHead(time) else DefaultTSer.this.indexOfOccurredTimeFromTail(time)
       _values(idx)
     }
 
@@ -468,20 +384,7 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    }
    }
 
-   def update(time: Long, fromHeadOrTail: Boolean, value: V): Boolean = {
-   val idx = if (fromHeadOrTail) DefaultTSer.this.indexOfOccurredTimeFromHead(time) else DefaultTSer.this.indexOfOccurredTimeFromTail(time)
-   if (idx >= 0) {
-   values.add(time, value)
-   true
-   } else {
-   assert(false, "Add timestamps first before add an element! " + ": " + "idx=" + idx + ", time=" + time)
-   false
-   }
-   }
-
    def apply(time: Long): V = values(time)
-
-   def apply(time: Long, fromHeadOrTail: Boolean): V = values(time)
 
    def update(time: Long, value: V) {
    values(time) = value
