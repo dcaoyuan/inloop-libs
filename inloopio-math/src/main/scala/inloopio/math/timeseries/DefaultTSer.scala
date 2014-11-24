@@ -321,7 +321,23 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
     def apply[V: ClassTag](name: String, kind: Kind, plot: Plot): TVar[V] = new InnerTVar[V](name, kind, plot)
   }
 
-  final protected class InnerTVar[V: ClassTag](_name: String, _kind: TVar.Kind, _plot: Plot) extends AbstractInnerTVar[V](_name, _kind, _plot) {
+  /**
+   * Define inner Var class
+   * -----------------------------------------------------------------------
+   * Horizontal view of DefaultSer. Is' a reference of one of the field vars.
+   *
+   * Inner Var can only live in DefaultSer.
+   *
+   * We define it as inner class of DefaultSer, to avoid bad usage, especially
+   * when its values is also managed by DefaultSer. We should make sure the
+   * operation on values, including add, delete actions will be consistant by
+   * cooperating with DefaultSer.
+   */
+  final protected class InnerTVar[V: ClassTag](var name: String, val kind: TVar.Kind, val plot: Plot) extends TVar[V] {
+
+    addVar(this)
+
+    def timestamps = DefaultTSer.this.timestamps
 
     private var _values = new ArrayList[V](INIT_CAPACITY)
     def values = _values
@@ -351,24 +367,44 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
       values(idx) = value
     }
 
-    // @Note, see https://lampsvn.epfl.ch/trac/scala/ticket/2599
     override def apply(idx: Int): V = {
-      super.apply(idx)
+      super.apply(idx) // @Note, see https://lampsvn.epfl.ch/trac/scala/ticket/2599 
     }
 
-    // @Note, see https://lampsvn.epfl.ch/trac/scala/ticket/2599
     override def update(idx: Int, value: V) {
-      super.update(idx, value)
+      super.update(idx, value) // @Note, see https://lampsvn.epfl.ch/trac/scala/ticket/2599 
+
     }
 
     def timesIterator: Iterator[Long] = timestamps.iterator
     def valuesIterator: Iterator[V] = _values.iterator
+
+    var layer = -1 // -1 means not set
+    // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
+    private lazy val colors = new TStampedMapBasedList[Color](timestamps)
+    def getColor(idx: Int) = colors(idx)
+    def setColor(idx: Int, color: Color) {
+      colors(idx) = color
+    }
+
   }
 
   //@todo SparseTVar
   /* protected class SparseTVar[V: ClassTag](
-   name: String, plot: Plot
-   ) extends AbstractInnerTVar[V](name, plot) {
+   name: String, val kind: TVar.Kind, val plot: Plot
+   ) extends TVar[V] {
+
+      addVar(this)
+
+    def timestamps = DefaultTSer.this.timestamps
+
+    var layer = -1 // -1 means not set
+    // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
+    private lazy val colors = new TStampedMapBasedList[Color](timestamps)
+    def getColor(idx: Int) = colors(idx)
+    def setColor(idx: Int, color: Color) {
+      colors(idx) = color
+    }
 
    // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
    lazy val values = new TStampedMapBasedList[V](timestamps)
@@ -402,31 +438,4 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    super.update(idx, value)
    }
    } */
-
-  /**
-   * Define inner Var class
-   * -----------------------------------------------------------------------
-   * Horizontal view of DefaultSer. Is' a reference of one of the field vars.
-   *
-   * Inner Var can only live with DefaultSer.
-   *
-   * We define it as inner class of DefaultSer, to avoid bad usage, especially
-   * when its values is also managed by DefaultSer. We should make sure the
-   * operation on values, including add, delete actions will be consistant by
-   * cooperating with DefaultSer.
-   */
-  abstract class AbstractInnerTVar[V: ClassTag](var name: String, val kind: TVar.Kind, val plot: Plot) extends TVar[V] {
-
-    addVar(this)
-
-    def timestamps = DefaultTSer.this.timestamps
-
-    var layer = -1 // -1 means not set
-    // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
-    private lazy val colors = new TStampedMapBasedList[Color](timestamps)
-    def getColor(idx: Int) = colors(idx)
-    def setColor(idx: Int, color: Color) {
-      colors(idx) = color
-    }
-  }
 }

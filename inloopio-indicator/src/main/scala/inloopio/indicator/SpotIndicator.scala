@@ -3,8 +3,10 @@ package inloopio.indicator
 import inloopio.collection.ArrayList
 import inloopio.math.timeseries.Null
 import inloopio.math.timeseries.TBaseSer
+import inloopio.math.timeseries.TStampedMapBasedList
 import inloopio.math.timeseries.TVar
 import inloopio.math.indicator.Plot
+import java.awt.Color
 import scala.collection.immutable
 import scala.reflect.ClassTag
 
@@ -49,7 +51,19 @@ abstract class SpotIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) wit
     def apply[V: ClassTag](name: String, kind: TVar.Kind, plot: Plot): TVar[V] = new SpotTVar[V](name, kind, plot)
   }
 
-  final protected class SpotTVar[V: ClassTag](_name: String, _kind: TVar.Kind, _plot: Plot) extends AbstractInnerTVar[V](_name, _kind, _plot) {
+  final protected class SpotTVar[V: ClassTag](var name: String, val kind: TVar.Kind, val plot: Plot) extends TVar[V] {
+
+    addVar(this)
+
+    def timestamps = SpotIndicator.this.timestamps
+
+    var layer = -1 // -1 means not set
+    // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
+    private lazy val colors = new TStampedMapBasedList[Color](timestamps)
+    def getColor(idx: Int) = colors(idx)
+    def setColor(idx: Int, color: Color) {
+      colors(idx) = color
+    }
 
     private var timeToValue = immutable.TreeMap[Long, V]() // must sort by time
 
