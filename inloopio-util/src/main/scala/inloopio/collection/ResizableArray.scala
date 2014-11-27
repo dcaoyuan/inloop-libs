@@ -35,11 +35,13 @@ trait ResizableArray[A] extends IndexedSeq[A]
   /** trait can not have type parameters like ResizableArray[A : ClassTag], so we have define an implicit val here */
   protected implicit val m: ClassTag[A]
 
-  protected val elementClass: Option[Class[A]]
-
   override def companion: GenericCompanion[ResizableArray] = ResizableArray
 
+  protected def elementClass: Option[Class[A]] = None
   protected def initialSize: Int = 16
+  protected def maxCapacity: Int = Int.MaxValue
+  protected[collection] var cursor0: Int = 0
+
   protected[collection] var array: Array[A] = makeArray(initialSize)
 
   /**
@@ -70,24 +72,40 @@ trait ResizableArray[A] extends IndexedSeq[A]
    */
   def length: Int = size0
 
+  /**
+   * Translate idx to true idx of underlying array according to cursor0
+   * if idx >= size0, will return -1
+   */
+  final protected def trueIdx(idx: Int) = {
+    val idx1 = cursor0 + idx
+    if (idx1 < size0) {
+      idx1
+    } else {
+      idx1 - size0
+    }
+  }
+
+  final protected def shiftCursor(n: Int) {
+    cursor0 += n
+    while (cursor0 >= maxCapacity) {
+      cursor0 -= maxCapacity
+    }
+  }
+
   def apply(idx: Int) = {
     if (idx >= size0) throw new IndexOutOfBoundsException(idx.toString)
-    array(idx)
+    array(trueIdx(idx))
   }
 
   def update(idx: Int, elem: A) {
     if (idx >= size0) throw new IndexOutOfBoundsException(idx.toString)
-    array(idx) = elem
+    array(trueIdx(idx)) = elem
   }
 
   override def foreach[U](f: A => U) {
-    // size is cached here because profiling reports a lot of time spent calling
-    // it on every iteration.  I think it's likely a profiler ghost but it doesn't
-    // hurt to lift it into a local.
     var i = 0
-    val top = size
-    while (i < top) {
-      f(array(i))
+    while (i < size0) {
+      f(array(trueIdx(i)))
       i += 1
     }
   }
@@ -103,8 +121,15 @@ trait ResizableArray[A] extends IndexedSeq[A]
    *  @param  len number of elements to copy
    */
   override def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) {
-    val len1 = len min (xs.length - start) min length
-    scala.compat.Platform.arraycopy(array, 0, xs, start, len1)
+    val len1 = math.min(math.min(len, xs.length - start), size)
+    val srcStart1 = trueIdx(0)
+    val nBehindCursor = size0 - srcStart1
+    if (nBehindCursor >= len1) {
+      scala.compat.Platform.arraycopy(array, srcStart1, xs, start, len1)
+    } else {
+      scala.compat.Platform.arraycopy(array, srcStart1, xs, start, nBehindCursor)
+      scala.compat.Platform.arraycopy(array, 0, xs, start + nBehindCursor, len1 - nBehindCursor)
+    }
   }
 
   //##########################################################################
@@ -114,24 +139,49 @@ trait ResizableArray[A] extends IndexedSeq[A]
    */
   def reduceToSize(sz: Int) {
     require(sz <= size0)
-    while (size0 > sz) {
-      size0 -= 1
-      if (!m.runtimeClass.isPrimitive) {
-        array(size0) = null.asInstanceOf[A]
+    if (cursor0 == 0) {
+      if (m.runtimeClass.isPrimitive) {
+        while (size0 > sz) {
+          size0 -= 1
+        }
+      } else {
+        while (size0 > sz) {
+          size0 -= 1
+          array(size0) = null.asInstanceOf[A]
+        }
       }
+    } else {
+      val newArray = makeArray(array.length)
+
+      val nBehindCursor = math.min(sz, size0 - cursor0)
+      if (nBehindCursor > 0) {
+        scala.compat.Platform.arraycopy(array, cursor0, newArray, 0, nBehindCursor)
+      }
+      val nBeforeCursor = sz - nBehindCursor
+      if (nBeforeCursor > 0) {
+        scala.compat.Platform.arraycopy(array, 0, newArray, nBehindCursor, nBeforeCursor)
+      }
+
+      array = newArray
+      cursor0 = 0
+      size0 = sz
     }
   }
 
-  /** ensure that the internal array has at n cells */
+  /** Ensure that the internal array has at least `n` cells. */
   protected def ensureSize(n: Int) {
-    if (n > array.length) {
-      // make sure newsize is not 0 by math.max(array.length, 1)
-      var newsize = math.max(array.length, 1) * 2
-      while (n > newsize)
-        newsize = newsize * 2
-      val newar = makeArray(newsize)
-      scala.compat.Platform.arraycopy(array, 0, newar, 0, size0)
-      array = newar
+    // Use a Long to prevent overflows
+    val arrayLength: Long = array.length
+    if (n > arrayLength) {
+      var newSize: Long = arrayLength + initialSize
+      while (newSize <= n)
+        newSize += initialSize
+      // Clamp newSize to maxCapacity 
+      if (newSize > maxCapacity) newSize = maxCapacity
+
+      val newArray = makeArray(newSize.toInt)
+      scala.compat.Platform.arraycopy(array, 0, newArray, 0, size0)
+      array = newArray
     }
   }
 
@@ -139,16 +189,11 @@ trait ResizableArray[A] extends IndexedSeq[A]
    * Swap two elements of this array.
    */
   protected def swap(a: Int, b: Int) {
-    val h = array(a)
-    array(a) = array(b)
-    array(b) = h
-  }
-
-  /**
-   * Move parts of the array.
-   */
-  protected def copy(m: Int, n: Int, len: Int) {
-    scala.compat.Platform.arraycopy(array, m, array, n, len)
+    val a1 = trueIdx(a)
+    val b1 = trueIdx(b)
+    val h = array(a1)
+    array(a1) = array(b1)
+    array(b1) = h
   }
 }
 
