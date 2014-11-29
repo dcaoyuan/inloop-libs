@@ -98,11 +98,14 @@ import scala.reflect.ClassTag
  * @version 1.0, 11/22/2006
  * @since   1.0.4
  */
-final class TStampedMapBasedList[A: ClassTag](timestamps: TStamps) extends AbstractArrayList[A](16, None)
+final class TStampedMapBasedList[A: ClassTag](timestamps: TStamps) extends AbstractArrayList[A](None)
     with GenericTraversableTemplate[A, TStampedMapBasedList]
     with BufferLike[A, TStampedMapBasedList[A]]
     with IndexedSeqOptimized[A, TStampedMapBasedList[A]]
     with Builder[A, TStampedMapBasedList[A]] {
+
+  override protected def initialSize = 16
+  override protected def maxCapacity = Int.MaxValue
 
   private val timeToElementData = new mutable.HashMap[Long, A]()
 

@@ -23,10 +23,14 @@ import scala.reflect.ClassTag
  * @version 1.02, 11/25/2006
  * @since   1.0.4
  */
-final class TStampsLog(initialSize: Int) extends AbstractArrayList[Short](initialSize, None) {
+final class TStampsLog(_initialSize: Int, _maxCapacity: Int) extends AbstractArrayList[Short](None) {
   import TStampsLog._
 
-  def this() = this(16)
+  def this() = this(16, Int.MaxValue)
+  def this(initialSize: Int) = this(initialSize, Int.MaxValue)
+
+  override protected def initialSize = if (_maxCapacity < _initialSize) _maxCapacity else _initialSize
+  override protected def maxCapacity = _maxCapacity
 
   private var _logCursor = -1
   private var _logTime = System.currentTimeMillis
@@ -184,7 +188,7 @@ object TStampsLog {
   val NUMBER = 0xC000 // 1100 0000 0000 0000
 }
 
-abstract class TStamps(initialSize: Int) extends AbstractArrayList[Long](initialSize, None) with Cloneable {
+abstract class TStamps(_initialSize: Int, _maxCapacity: Int) extends AbstractArrayList[Long](None) with Cloneable {
   val LONG_LONG_AGO = new GregorianCalendar(1900, Calendar.JANUARY, 1).getTimeInMillis
 
   private val readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock
@@ -192,6 +196,9 @@ abstract class TStamps(initialSize: Int) extends AbstractArrayList[Long](initial
   val writeLock = readWriteLock.writeLock
 
   val log = new TStampsLog(initialSize)
+
+  override protected def initialSize = if (_maxCapacity < _initialSize) _maxCapacity else _initialSize
+  override protected def maxCapacity = _maxCapacity
 
   def isOnCalendar: Boolean
 
@@ -253,9 +260,9 @@ abstract class TStamps(initialSize: Int) extends AbstractArrayList[Long](initial
  */
 object TStamps {
 
-  def apply(initialCapacity: Int): TStamps = new TStampsOnOccurred(initialCapacity)
+  def apply(initialSize: Int): TStamps = new TStampsOnOccurred(initialSize, Int.MaxValue)
 
-  private class TStampsOnOccurred(initialCapacity: Int) extends TStamps(initialCapacity) {
+  private class TStampsOnOccurred(_initialSize: Int, _maxCapacity: Int) extends TStamps(_initialSize, _maxCapacity) {
 
     private val onCalendarShadow = new TStampsOnCalendar(this)
 
@@ -508,7 +515,7 @@ object TStamps {
     }
 
     override def clone: TStamps = {
-      new TStampsOnOccurred(this.size) ++= this
+      new TStampsOnOccurred(this.initialSize, this.maxCapacity) ++= this
     }
 
     class ItrOnOccurred(freq: TFreq, _fromTime: Long, toTime: Long, timeZone: TimeZone) extends TStampsIterator {
@@ -611,10 +618,10 @@ object TStamps {
     def result: TStampsOnOccurred = this
 
     override def reverse: TStampsOnOccurred = {
-      val reversed = new TStampsOnOccurred(size)
+      val reversed = new TStampsOnOccurred(this.initialSize, this.maxCapacity)
       var i = 0
       while (i < size) {
-        reversed(i) = apply(size - 1 - i)
+        reversed += apply(size - 1 - i)
         i += 1
       }
       reversed
@@ -635,7 +642,7 @@ object TStamps {
    * isOnCalendar() always return true.
    * Why not to use Proxy.class ? for performance reason.
    */
-  private class TStampsOnCalendar(delegateTimestamps: TStamps) extends TStamps(0) {
+  private class TStampsOnCalendar(delegateTimestamps: TStamps) extends TStamps(0, Int.MaxValue) {
     /**
      * the timestamps to be wrapped, it not necessary to be a TimestampsOnOccurred,
      * any class implemented Timestamps is ok.
