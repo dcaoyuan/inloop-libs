@@ -9,7 +9,6 @@ import akka.event.Logging
 import akka.testkit.ImplicitSender
 import akka.testkit.TestKit
 import com.typesafe.config.ConfigFactory
-import inloopio.math.indicator.Plot
 import inloopio.math.timeseries.descriptor.Content
 import java.util.Calendar
 import java.util.TimeZone
@@ -146,11 +145,11 @@ class ExampleThing() extends Actor with ActorLogging with Thing {
 
 class ExampleSer(_thing: Thing, _freq: TFreq) extends DefaultTBaseSer(_thing, _freq) {
 
-  val open = TVar[Double]("O", TVar.Kind.Open, Plot.OHLC)
-  val high = TVar[Double]("H", TVar.Kind.High, Plot.OHLC)
-  val low = TVar[Double]("L", TVar.Kind.Low, Plot.OHLC)
-  val close = TVar[Double]("C", TVar.Kind.Close, Plot.OHLC)
-  val volume = TVar[Double]("V", TVar.Kind.Accumlate, Plot.Volume)
+  val open = TVar[Double]("O", TVar.Kind.Open)
+  val high = TVar[Double]("H", TVar.Kind.High)
+  val low = TVar[Double]("L", TVar.Kind.Low)
+  val close = TVar[Double]("C", TVar.Kind.Close)
+  val volume = TVar[Double]("V", TVar.Kind.Accumlate)
   val isClosed = TVar[Boolean]("E")
 
   override val exportableVars = List(open, high, low, close, volume)

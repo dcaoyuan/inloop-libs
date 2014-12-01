@@ -13,9 +13,9 @@ class VOLIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) {
   val period1 = Factor("Period Short", 5)
   val period2 = Factor("Period Mediaum", 10)
 
-  val vol = TVar[Double]("VOL", Plot.Volume)
-  val ma1 = TVar[Double]("MA1", Plot.Line)
-  val ma2 = TVar[Double]("MA2", Plot.Line)
+  val vol = TVar[Double]("VOL")
+  val ma1 = TVar[Double]("MA1")
+  val ma2 = TVar[Double]("MA2")
 
   protected def compute(fromIdx: Int, size: Int) {
     var i = fromIdx

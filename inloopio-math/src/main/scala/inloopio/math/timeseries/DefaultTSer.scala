@@ -21,16 +21,15 @@ import scala.reflect.ClassTag
  * So you can use it as full series, but don't use those methods of TBaseSer
  * except you sub class this.
  *
+ *
+ * The max capacity of ONE_MIN for trading  is 15000 / 240  = 62.5 days, about 3 months
+ * The max capacity of ONE_MIN for calendar is 20160 / 1440 = 14 days, 2 weeks
+ * The max capacity of DAILY for trading  is 15000/ 250 = 60 years.
+ * The max capacity of DAILY for calendar is 20160/ 365 = 55 years.
+ *
  * @author Caoyuan Deng
  */
-abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
-
-  protected val INIT_CAPACITY = 100
-  /**
-   * The length of ONE_MIN is 15000/240 = 62.5 days, about 3 months
-   * The length of DAILY is 15000/ 250 = 60 years.
-   */
-  protected val MAX_DATA_SIZE = 15000
+abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY, initialSize: Int = 72, maxCapacity: Int = 20160) extends TSer {
 
   /**
    * a place holder plus flags
@@ -315,10 +314,9 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
     val Kind = inloopio.math.timeseries.TVar.Kind
     type Kind = inloopio.math.timeseries.TVar.Kind
 
-    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", Kind.Close, Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, Kind.Close, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new InnerTVar[V](name, Kind.Close, plot)
-    def apply[V: ClassTag](name: String, kind: Kind, plot: Plot): TVar[V] = new InnerTVar[V](name, kind, plot)
+    def apply[V: ClassTag](): TVar[V] = new InnerTVar[V]("", Kind.Close)
+    def apply[V: ClassTag](name: String): TVar[V] = new InnerTVar[V](name, Kind.Close)
+    def apply[V: ClassTag](name: String, kind: Kind): TVar[V] = new InnerTVar[V](name, kind)
   }
 
   /**
@@ -333,13 +331,13 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
    * operation on values, including add, delete actions will be consistant by
    * cooperating with DefaultSer.
    */
-  final protected class InnerTVar[V: ClassTag](var name: String, val kind: TVar.Kind, val plot: Plot) extends TVar[V] {
+  final protected class InnerTVar[V: ClassTag](var name: String, val kind: TVar.Kind) extends TVar[V] {
 
     addVar(this)
 
     def timestamps = DefaultTSer.this.timestamps
 
-    private var _values = new ArrayList[V](INIT_CAPACITY)
+    private var _values = new ArrayList[V](initialSize, maxCapacity)
     def values = _values
 
     def put(time: Long, value: V): Boolean = {
@@ -379,6 +377,7 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
     def timesIterator: Iterator[Long] = timestamps.iterator
     def valuesIterator: Iterator[V] = _values.iterator
 
+    var plot: Plot = Plot.None
     var layer = -1 // -1 means not set
     // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
     private lazy val colors = new TStampedMapBasedList[Color](timestamps)
@@ -386,7 +385,6 @@ abstract class DefaultTSer(val freq: TFreq = TFreq.DAILY) extends TSer {
     def setColor(idx: Int, color: Color) {
       colors(idx) = color
     }
-
   }
 
   //@todo SparseTVar

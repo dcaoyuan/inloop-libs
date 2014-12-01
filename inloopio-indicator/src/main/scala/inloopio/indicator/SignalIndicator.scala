@@ -21,7 +21,7 @@ abstract class SignalIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) w
   isOverlapping = true
 
   //val signalVar = new SparseTVar[Signal](SignalIndicator.SIGNAL_VAR_KEY, Plot.Signal)
-  val signalVar = TVar[List[Signal]](SignalIndicator.SIGNAL_VAR_KEY, Plot.Signal)
+  val signalVar = TVar[List[Signal]](SignalIndicator.SIGNAL_VAR_KEY)
 
   def this() = this(null)
 

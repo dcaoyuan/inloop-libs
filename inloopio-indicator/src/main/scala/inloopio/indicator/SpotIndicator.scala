@@ -45,18 +45,18 @@ abstract class SpotIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) wit
   protected def computeSpot(time: Long, baseIdx: Int)
 
   object STVar {
-    def apply[V: ClassTag](): TVar[V] = new SpotTVar[V]("", TVar.Kind.Close, Plot.None)
-    def apply[V: ClassTag](name: String): TVar[V] = new SpotTVar[V](name, TVar.Kind.Close, Plot.None)
-    def apply[V: ClassTag](name: String, plot: Plot): TVar[V] = new SpotTVar[V](name, TVar.Kind.Close, plot)
-    def apply[V: ClassTag](name: String, kind: TVar.Kind, plot: Plot): TVar[V] = new SpotTVar[V](name, kind, plot)
+    def apply[V: ClassTag](): TVar[V] = new SpotTVar[V]("", TVar.Kind.Close)
+    def apply[V: ClassTag](name: String): TVar[V] = new SpotTVar[V](name, TVar.Kind.Close)
+    def apply[V: ClassTag](name: String, kind: TVar.Kind): TVar[V] = new SpotTVar[V](name, kind)
   }
 
-  final protected class SpotTVar[V: ClassTag](var name: String, val kind: TVar.Kind, val plot: Plot) extends TVar[V] {
+  final protected class SpotTVar[V: ClassTag](var name: String, val kind: TVar.Kind) extends TVar[V] {
 
     addVar(this)
 
     def timestamps = SpotIndicator.this.timestamps
 
+    var plot: Plot = Plot.None
     var layer = -1 // -1 means not set
     // @todo: timestamps may be null when go here, use lazy val as a quick fix now, shoule review it
     private lazy val colors = new TStampedMapBasedList[Color](timestamps)

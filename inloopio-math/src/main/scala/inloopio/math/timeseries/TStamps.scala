@@ -260,7 +260,7 @@ abstract class TStamps(_initialSize: Int, _maxCapacity: Int) extends AbstractArr
  */
 object TStamps {
 
-  def apply(initialSize: Int): TStamps = new TStampsOnOccurred(initialSize, Int.MaxValue)
+  def apply(initialSize: Int, maxCapacity: Int): TStamps = new TStampsOnOccurred(initialSize, maxCapacity)
 
   private class TStampsOnOccurred(_initialSize: Int, _maxCapacity: Int) extends TStamps(_initialSize, _maxCapacity) {
 

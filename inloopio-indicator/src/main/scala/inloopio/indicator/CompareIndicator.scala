@@ -17,11 +17,11 @@ class CompareIndicator(_baseSer: TBaseSer) extends Indicator(_baseSer) {
   val maxValue = Factor("Max Value", Double.MinValue)
   val minValue = Factor("Min Value", Double.MaxValue)
 
-  var open = TVar[Double]("O", Plot.OHLC)
-  var high = TVar[Double]("H", Plot.OHLC)
-  var low = TVar[Double]("L", Plot.OHLC)
-  var close = TVar[Double]("C", Plot.OHLC)
-  var volume = TVar[Double]("V", Plot.Volume)
+  var open = TVar[Double]("O")
+  var high = TVar[Double]("H")
+  var low = TVar[Double]("L")
+  var close = TVar[Double]("C")
+  var volume = TVar[Double]("V")
 
   protected def compute(begIdx: Int, size: Int) {
     /** camparing base point is the value of begin time (the most left on screen */

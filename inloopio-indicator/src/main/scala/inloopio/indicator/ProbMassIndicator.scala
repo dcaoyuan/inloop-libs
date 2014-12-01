@@ -19,9 +19,9 @@ class ProbMassIndicator(_baseSer: TBaseSer) extends SpotIndicator(_baseSer) {
   val period2 = Factor("Period2", 100.0)
   val period3 = Factor("Period3", 200.0)
 
-  val MASS1 = STVar[Array[Array[Double]]]("MASS1", Plot.Profile)
-  val MASS2 = STVar[Array[Array[Double]]]("MASS2", Plot.Profile)
-  val MASS3 = STVar[Array[Array[Double]]]("MASS3", Plot.Profile)
+  val MASS1 = STVar[Array[Array[Double]]]("MASS1")
+  val MASS2 = STVar[Array[Array[Double]]]("MASS2")
+  val MASS3 = STVar[Array[Array[Double]]]("MASS3")
 
   protected def computeSpot(time: Long, baseIdx: Int) {
     if (baseIdx > 0) {

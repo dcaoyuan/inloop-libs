@@ -1,6 +1,5 @@
 package inloopio.math.timeseries
 
-import inloopio.math.indicator.Plot
 import scala.collection.mutable
 
 /**
@@ -12,12 +11,12 @@ abstract class ThingSer(_thing: Thing, _freq: TFreq) extends DefaultTBaseSer(_th
   private var _shortName: String = thing.identifier
   private var _isAdjusted: Boolean = false
 
-  val open = TVar[Double]("O", Plot.OHLC)
-  val high = TVar[Double]("H", Plot.OHLC)
-  val low = TVar[Double]("L", Plot.OHLC)
-  val close = TVar[Double]("C", Plot.OHLC)
-  val volume = TVar[Double]("V", Plot.Volume)
-  val amount = TVar[Double]("A", Plot.Volume)
+  val open = TVar[Double]("O")
+  val high = TVar[Double]("H")
+  val low = TVar[Double]("L")
+  val close = TVar[Double]("C")
+  val volume = TVar[Double]("V")
+  val amount = TVar[Double]("A")
   val isClosed = TVar[Boolean]("E")
 
   override val exportableVars = List(open, high, low, close, volume, amount)

@@ -1,11 +1,6 @@
 package inloopio.math.timeseries
 
-/**
- *
- * @author Caoyuan Deng
- */
 import akka.pattern.ask
-import akka.util.Timeout
 import inloopio.math.indicator.Factor
 import inloopio.math.indicator.Function
 import inloopio.math.indicator.Id
@@ -15,14 +10,21 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
-class DefaultTBaseSer(_thing: Thing, _freq: TFreq = TFreq.DAILY) extends DefaultTSer(_freq) with TBaseSer {
+/**
+ *
+ * @author Caoyuan Deng
+ */
+class DefaultTBaseSer(
+    _thing: Thing,
+    _freq: TFreq = TFreq.DAILY,
+    initialSize: Int = 72,
+    maxCapacity: Int = 20160) extends DefaultTSer(_freq, initialSize, maxCapacity) with TBaseSer {
 
-  private val timeout = Timeout(5.seconds)
   private var _isOnCalendarMode = false
   private lazy val idToFunction = new ConcurrentHashMap[Id[_ <: Function], Function](8, 0.9f, 1)
   private lazy val idToIndicator = new ConcurrentHashMap[Id[_ <: Indicator], Indicator](8, 0.9f, 1)
 
-  attach(TStamps(INIT_CAPACITY))
+  attach(TStamps(initialSize, maxCapacity))
 
   def context = thing.context
 
